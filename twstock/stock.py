@@ -62,6 +62,9 @@ class Stock(analytics.Analytics):
         self.raw_data = []
         self.data = []
 
+        # Init data
+        self.fetch_31()
+
     def _month_year_iter(self, start_month, start_year, end_month, end_year):
         ym_start = 12 * start_year + start_month - 1
         ym_end = 12 * end_year + end_month - 1
@@ -85,6 +88,14 @@ class Stock(analytics.Analytics):
             self.data.extend(self.raw_data[-1]['data'])
         return self.data
 
+    def fetch_31(self):
+        """Fetch 31 days data"""
+        today = datetime.datetime.today()
+        before = today - datetime.timedelta(days=60)
+        self.fetch_from(before.year, before.month)
+        self.data = self.data[-31:]
+        return self.data
+
     @property
     def price(self):
         return [d.close for d in self.data]
@@ -98,6 +109,10 @@ class Stock(analytics.Analytics):
         return [d.low for d in self.data]
 
     @property
+    def open(self):
+        return [d.open for d in self.data]
+
+    @property
     def capacity(self):
         return [d.capacity for d in self.data]
 
@@ -105,4 +120,3 @@ class Stock(analytics.Analytics):
 if __name__ == '__main__':
     f = Stock('2330')
     f.fetch(2015, 5)
-    print(f.capacity)
