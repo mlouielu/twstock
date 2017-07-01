@@ -3,7 +3,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-tests_require = ['pytest', 'Sphinx']
 
 long_description = """
 twstock is a minimum re-implement of grs
@@ -21,10 +20,7 @@ setup(name="twstock",
       maintainer_email="git@louie.lu",
       url="https://github.com/mlouielu/twstock",
       packages=['twstock'],
-      tests_require=tests_require,
-      extras_require={
-          'test': tests_require,
-      },
+      test_suite='test',
       classifiers=[
           'Programming Language :: Python :: 3',
       ]
