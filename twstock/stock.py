@@ -85,8 +85,16 @@ class Stock(analytics.Analytics):
             self.data.extend(self.raw_data[-1]['data'])
         return self.data
 
+    @property
+    def price(self):
+        return [d.close for d in self.data]
+
+    @property
+    def capacity(self):
+        return [d.capacity for d in self.data]
+
 
 if __name__ == '__main__':
     f = Stock('2330')
     f.fetch(2015, 5)
-    print(f.price)
+    print(f.capacity)
