@@ -3,7 +3,13 @@
 import datetime
 import urllib.parse
 from collections import namedtuple
+
 import requests
+
+try:
+    from . import analytics
+except ImportError:
+    import analytics
 
 
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
@@ -48,7 +54,7 @@ class TWSEFetcher(object):
         return [self._make_datatuple(d) for d in original_data['data']]
 
 
-class Stock(object):
+class Stock(analytics.Analytics):
 
     def __init__(self, sid: str):
         self.sid = sid
@@ -66,7 +72,7 @@ class Stock(object):
     def fetch(self, year: int, month: int):
         """Fetch year month data"""
         self.raw_data = [self.fetcher.fetch(year, month, self.sid)]
-        self.data = self.raw_data['data']
+        self.data = self.raw_data[0]['data']
         return self.data
 
     def fetch_from(self, year: int, month: int):
@@ -82,4 +88,5 @@ class Stock(object):
 
 if __name__ == '__main__':
     f = Stock('2330')
-    print(f.fetch_from(2017, 5))
+    f.fetch(2015, 5)
+    print(f.price)
