@@ -42,6 +42,16 @@ class StockTest(unittest.TestCase):
                           148.0, 146.0, 146.5, 146.5, 146.5, 146.5, 145.5,
                           145.5, 147.5, 146.5, 145.0, 147.0, 146.0])
 
+    def test_high(self):
+        self.assertIsInstance(self.stk.high, list)
+        self.assertEqual(len(self.stk.high), len(self.stk.data))
+        self.assertEqual(self.stk.high, [d.high for d in self.stk.data])
+
+    def test_low(self):
+        self.assertIsInstance(self.stk.low, list)
+        self.assertEqual(len(self.stk.low), len(self.stk.data))
+        self.assertEqual(self.stk.low, [d.low for d in self.stk.data])
+
     def test_capacity(self):
         self.assertIsInstance(self.stk.capacity, list)
         self.assertEqual(len(self.stk.capacity), len(self.stk.data))

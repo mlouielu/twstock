@@ -90,6 +90,14 @@ class Stock(analytics.Analytics):
         return [d.close for d in self.data]
 
     @property
+    def high(self):
+        return [d.high for d in self.data]
+
+    @property
+    def low(self):
+        return [d.low for d in self.data]
+
+    @property
     def capacity(self):
         return [d.capacity for d in self.data]
 
