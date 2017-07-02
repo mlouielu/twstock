@@ -1,10 +1,11 @@
 import unittest
 from twstock import analytics
+from twstock import legacy
 
 
 class AnalyticsTest(unittest.TestCase):
     def setUp(self):
-        self.legacy = analytics.LegacyAnalytics()
+        self.legacy = legacy.LegacyAnalytics()
         self.ng = analytics.Analytics()
 
     def test_continuous(self):
