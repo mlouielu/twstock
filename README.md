@@ -11,7 +11,7 @@ twstock 台灣股市股票價格擷取
 資料來源:
 
 * [證券交易所 (TWSE)](http://www.twse.com.tw)
-
+* [證券櫃台買賣中心 (TPEX)](http://www.tpex.org.tw)
 
 ## Requirements
 

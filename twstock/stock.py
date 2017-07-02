@@ -8,11 +8,14 @@ import requests
 
 try:
     from . import analytics
+    from .codes import codes
 except ImportError:
     import analytics
+    from codes import codes
 
 
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
+TPEX_BASE_URL = 'http://www.tpex.org.tw/'
 DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
                                 'high', 'low', 'close', 'ratio', 'transaction'])
 
@@ -54,11 +57,47 @@ class TWSEFetcher(object):
         return [self._make_datatuple(d) for d in original_data['data']]
 
 
+class TPEXFetcher(object):
+    REPORT_URL = urllib.parse.urljoin(TPEX_BASE_URL,
+                                      'web/stock/aftertrading/daily_trading_info/st43_result.php')
+
+    def __init__(self):
+        pass
+
+    def fetch(self, year: int, month: int, sid: str):
+        params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
+        r = requests.get(self.REPORT_URL, params=params)
+        data = r.json()
+
+        if data['aaData']:
+            data['data'] = self.purify(data)
+        return data
+
+    def _convert_date(self, date):
+        """Convert '106/05/01' to '2017/05/01'"""
+        return '/'.join([str(int(date.split('/')[0]) + 1911)] + date.split('/')[1:])
+
+    def _make_datatuple(self, data):
+        data[0] = datetime.datetime.strptime(self._convert_date(data[0]), '%Y/%m/%d')
+        data[1] = int(data[1].replace(',', '')) * 1000
+        data[2] = int(data[2].replace(',', '')) * 1000
+        data[3] = float(data[3].replace(',', ''))
+        data[4] = float(data[4].replace(',', ''))
+        data[5] = float(data[5].replace(',', ''))
+        data[6] = float(data[6].replace(',', ''))
+        data[7] = float(data[7].replace(',', ''))
+        data[8] = int(data[8].replace(',', ''))
+        return DATATUPLE(*data)
+
+    def purify(self, original_data):
+        return [self._make_datatuple(d) for d in original_data['aaData']]
+
+
 class Stock(analytics.Analytics):
 
     def __init__(self, sid: str):
         self.sid = sid
-        self.fetcher = TWSEFetcher()
+        self.fetcher = TWSEFetcher() if codes[sid].market == '上市' else TPEXFetcher()
         self.raw_data = []
         self.data = []
 
