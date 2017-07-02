@@ -69,6 +69,7 @@ class TPEXFetcher(object):
         r = requests.get(self.REPORT_URL, params=params)
         data = r.json()
 
+        data['data'] = []
         if data['aaData']:
             data['data'] = self.purify(data)
         return data
