@@ -127,5 +127,19 @@ class BestFourPointTest(unittest.TestCase):
                          self.legacy.best_four_point_to_sell())
 
     def test_best_four_point(self):
+        self.stock.fetch(2014, 5)
         self.assertEqual(self.ng.best_four_point(),
                          self.legacy.best_four_point())
+
+        self.stock.fetch(2015, 5)
+        self.assertEqual(self.ng.best_four_point(),
+                         self.legacy.best_four_point())
+
+        self.stock.fetch(2016, 5)
+        self.assertEqual(self.ng.best_four_point(),
+                         self.legacy.best_four_point())
+
+        self.stock.fetch(2017, 5)
+        self.assertEqual(self.ng.best_four_point(),
+                         self.legacy.best_four_point())
+
