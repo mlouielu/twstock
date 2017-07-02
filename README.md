@@ -6,6 +6,7 @@ twstock 台灣股市股票價格擷取
 ----------------------------
 
 擷取台灣證券交易所之股價資料
+重新製作 toomore/grs 之功能
 
 資料來源:
 
@@ -16,6 +17,16 @@ twstock 台灣股市股票價格擷取
 
 * requests
 * lxml
+
+## Install
+
+from GitHub:
+
+```
+$ git clone https://github.com/mlouielu/twstock
+$ cd twstock
+$ python setup.py install
+```
 
 ## Quick Start
 
@@ -61,3 +72,5 @@ bfp.best_four_point()           # 綜合判斷
 twstock was created by Louie Lu `<git@louie.lu>`.
 
 Contributing were welcome, please use GitHub issue and Pull Request to contribute!
+
+歡迎協作，請使用 GitHub issue 以及 Pull Request 功能來協作。
