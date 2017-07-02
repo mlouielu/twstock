@@ -47,6 +47,11 @@ class TPEXFetcherTest(unittest.TestCase, FetcherTest):
 
 
 class StockTest(object):
+    def test_fetch_31(self):
+        self.stk.fetch_31()
+        self.assertEqual(len(self.stk.data), 31)
+        self.assertEqual(len(self.stk.price), 31)
+
     def test_price(self):
         self.assertIsInstance(self.stk.price, list)
         self.assertEqual(len(self.stk.price), len(self.stk.data))
@@ -77,9 +82,9 @@ class TWSEStockTest(unittest.TestCase, StockTest):
     @classmethod
     def setUpClass(cls):
         cls.stk = stock.Stock('2330')
-        cls.stk.fetch(2015, 5)
 
     def test_price(self):
+        self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
         self.assertEqual(len(self.stk.price), len(self.stk.data))
         self.assertEqual(self.stk.price, [d.close for d in self.stk.data])
@@ -89,6 +94,7 @@ class TWSEStockTest(unittest.TestCase, StockTest):
                           145.5, 147.5, 146.5, 145.0, 147.0, 146.0])
 
     def test_capacity(self):
+        self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)
         self.assertEqual(len(self.stk.capacity), len(self.stk.data))
         self.assertEqual(self.stk.capacity, [d.capacity for d in self.stk.data])
@@ -103,9 +109,9 @@ class TPEXStockTest(unittest.TestCase, StockTest):
     @classmethod
     def setUpClass(cls):
         cls.stk = stock.Stock('6223')
-        cls.stk.fetch(2015, 5)
 
     def test_price(self):
+        self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
         self.assertEqual(len(self.stk.price), len(self.stk.data))
         self.assertEqual(self.stk.price, [d.close for d in self.stk.data])
@@ -115,6 +121,7 @@ class TPEXStockTest(unittest.TestCase, StockTest):
                           91.7, 90.4])
 
     def test_capacity(self):
+        self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)
         self.assertEqual(len(self.stk.capacity), len(self.stk.data))
         self.assertEqual(self.stk.capacity, [d.capacity for d in self.stk.data])
