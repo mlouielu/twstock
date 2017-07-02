@@ -163,13 +163,13 @@ class LegacyBestFourPoint(object):
             (self.best_buy_1() or self.best_buy_2() or self.best_buy_3() or \
              self.best_buy_4()):
             if self.best_buy_1():
-                result.append(self.best_buy_1.__doc__.strip().decode('utf-8'))
+                result.append(self.best_buy_1.__doc__.strip())
             if self.best_buy_2():
-                result.append(self.best_buy_2.__doc__.strip().decode('utf-8'))
+                result.append(self.best_buy_2.__doc__.strip())
             if self.best_buy_3():
-                result.append(self.best_buy_3.__doc__.strip().decode('utf-8'))
+                result.append(self.best_buy_3.__doc__.strip())
             if self.best_buy_4():
-                result.append(self.best_buy_4.__doc__.strip().decode('utf-8'))
+                result.append(self.best_buy_4.__doc__.strip())
             result = ', '.join(result)
         else:
             result = False
