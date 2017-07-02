@@ -94,7 +94,7 @@ class BestFourPoint(object):
         return (self.stock.moving_average(3, self.stock.price)[-1] <
                 self.stock.moving_average(6, self.stock.price)[-1])
 
-    def best_four_to_buy(self):
+    def best_four_point_to_buy(self):
         result = []
         check = [self.best_buy_1(), self.best_buy_2(),
                  self.best_buy_3(), self.best_buy_4()]
@@ -106,7 +106,7 @@ class BestFourPoint(object):
             return False
         return ', '.join(result)
 
-    def best_four_to_sell(self):
+    def best_four_point_to_sell(self):
         result = []
         check = [self.best_sell_1(), self.best_sell_2(),
                  self.best_sell_3(), self.best_sell_4()]
@@ -119,8 +119,8 @@ class BestFourPoint(object):
         return ', '.join(result)
 
     def best_four_point(self):
-        buy = self.best_four_to_buy()
-        sell = self.best_four_to_sell()
+        buy = self.best_four_point_to_buy()
+        sell = self.best_four_point_to_sell()
         if buy:
             return (True, buy)
         elif sell:
