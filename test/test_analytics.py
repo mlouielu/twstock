@@ -50,14 +50,14 @@ class AnalyticsTest(unittest.TestCase):
     def test_ma_bias_ratio(self):
         data = [50, 60, 70, 75, 80, 88, 102, 105, 106]
         self.ng.price = data
-        legacy_result = self.legacy.ma_bias_ratio(3, 6, data)
         ng_result = self.ng.ma_bias_ratio(3, 6)
+        legacy_result = self.legacy.ma_bias_ratio(3, 6, data)
         self.assertEqual(ng_result, legacy_result)
 
         data = [75, 72, 77, 85, 100, 65, 60, 55, 52, 45]
         self.ng.price = data
-        legacy_result = self.legacy.ma_bias_ratio(3, 6, data)
         ng_result = self.ng.ma_bias_ratio(3, 6)
+        legacy_result = self.legacy.ma_bias_ratio(3, 6, data)
         self.assertEqual(ng_result, legacy_result)
 
     def test_ma_bias_ratio_pivot(self):
@@ -66,8 +66,17 @@ class AnalyticsTest(unittest.TestCase):
         ng_result = self.ng.ma_bias_ratio_pivot(data, 5, False)
         self.assertEqual(legacy_result, ng_result)
 
+        legacy_result = self.legacy.ma_bias_ratio_point(data, 5, True)
+        ng_result = self.ng.ma_bias_ratio_pivot(data, 5, True)
+        self.assertEqual(legacy_result, ng_result)
+
         data = [75, 72, 77, 85, 100, 65, 60, 55, 52, 45]
         legacy_result = self.legacy.ma_bias_ratio_point(data, 5, False)
         ng_result = self.ng.ma_bias_ratio_pivot(data, 5, False)
         self.assertEqual(legacy_result, ng_result)
+
+        legacy_result = self.legacy.ma_bias_ratio_point(data, 5, True)
+        ng_result = self.ng.ma_bias_ratio_pivot(data, 5, True)
+        self.assertEqual(legacy_result, ng_result)
+
 
