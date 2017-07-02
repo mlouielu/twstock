@@ -75,6 +75,19 @@ ratio       = 漲跌價差
 transaction = 成交筆數
 ```
 
+台股證券編碼
+
+```
+>>> import twstock
+>>> print(twstock.codes)                # 列印台股全部證券編碼資料
+>>> print(twstock.codes['2330'])        # 列印 2330 證券編碼資料
+StockCodeInfo(type='股票', code='2330', name='台積電', ISIN='TW0002330008', start='1994/09/05', market='上市', group='半導體業', CFI='ESVUFR')
+>>> print(twstock.codes['2330'].name)   # 列印 2330 證券名稱
+'台積電'
+>>> print(twstock.codes['2330'].start)  # 列印 2330 證券上市日期
+'1994/09/05'
+```
+
 ## 四大買賣點分析
 
 ```
