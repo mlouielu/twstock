@@ -30,6 +30,7 @@ class LegacyAnalytics(object):
             :rtype: 序列 舊→新
         """
         result = []
+        data = data[:]
         for dummy in range(len(data) - int(days) + 1):
             result.append(round(sum(data[-days:]) / days, 2))
             data.pop()
