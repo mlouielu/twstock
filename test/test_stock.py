@@ -71,6 +71,11 @@ class TWSEStockTest(unittest.TestCase):
         self.assertEqual(len(self.stk.low), len(self.stk.data))
         self.assertEqual(self.stk.low, [d.low for d in self.stk.data])
 
+    def test_open(self):
+        self.assertIsInstance(self.stk.open, list)
+        self.assertEqual(len(self.stk.open), len(self.stk.data))
+        self.assertEqual(self.stk.open, [d.open for d in self.stk.data])
+
     def test_capacity(self):
         self.assertIsInstance(self.stk.capacity, list)
         self.assertEqual(len(self.stk.capacity), len(self.stk.data))
@@ -106,6 +111,11 @@ class TPEXStockTest(unittest.TestCase):
         self.assertIsInstance(self.stk.low, list)
         self.assertEqual(len(self.stk.low), len(self.stk.data))
         self.assertEqual(self.stk.low, [d.low for d in self.stk.data])
+
+    def test_open(self):
+        self.assertIsInstance(self.stk.open, list)
+        self.assertEqual(len(self.stk.open), len(self.stk.data))
+        self.assertEqual(self.stk.open, [d.open for d in self.stk.data])
 
     def test_capacity(self):
         self.assertIsInstance(self.stk.capacity, list)
