@@ -155,8 +155,3 @@ class Stock(analytics.Analytics):
     @property
     def capacity(self):
         return [d.capacity for d in self.data]
-
-
-if __name__ == '__main__':
-    f = Stock('2330')
-    f.fetch(2015, 5)
