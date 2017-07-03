@@ -1,4 +1,4 @@
-[![Build 
+[![Build
 Status](https://travis-ci.org/mlouielu/twstock.svg?branch=master)](https://travis-ci.org/mlouielu/twstock)
 [![Coverage Status](https://coveralls.io/repos/github/mlouielu/twstock/badge.svg?branch=master)](https://coveralls.io/github/mlouielu/twstock?branch=master)
 
@@ -31,18 +31,29 @@ $ cd twstock
 $ python setup.py install
 ```
 
-## Quick Start
-
-CLI 工具 - 四大買賣點
+## CLI Tools
 
 ```
-$ python -m twstock 2330 6223
+$ python -m twstock -b 2330 6223
 四大買賣點判斷 Best Four Point
 ------------------------------
 2330: Buy   量大收紅
 6223: Sell  量縮價跌, 三日均價小於六日均價
 ```
 
+```
+$ python -m twstock -s 2330 6223
+-------------- 2330 ----------------
+high : 215.0 214.0 210.0 210.5 208.5
+low  : 212.0 211.0 208.0 208.5 206.5
+price: 215.0 211.5 208.5 210.0 208.5
+-------------- 2337 ----------------
+high :  16.2  16.8  16.4 16.75 16.75
+low  :  15.8  16.1 15.15  16.3 16.25
+price: 15.95 16.25 16.25  16.6  16.7
+```
+
+## Quick Start
 
 分析計算
 
