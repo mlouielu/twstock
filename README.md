@@ -30,6 +30,17 @@ $ python setup.py install
 
 ## Quick Start
 
+CLI 工具 - 四大買賣點
+
+```
+$ python -m twstock 2330 6223
+四大買賣點判斷 Best Four Point
+------------------------------
+2330: Buy   量大收紅
+6223: Sell  量縮價跌, 三日均價小於六日均價
+```
+
+
 分析計算
 
 ```
