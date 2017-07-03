@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import json
 import urllib.parse
 from collections import namedtuple
 
@@ -29,12 +30,15 @@ class TWSEFetcher(object):
     def fetch(self, year: int, month: int, sid: str):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
         r = requests.get(self.REPORT_URL, params=params)
-        data = r.json()
+        try:
+            data = r.json()
+        except json.decoder.JSONDecodeError:
+            data = {'stat': '', 'data': []}
 
-        if data['stat'] == '很抱歉，沒有符合條件的資料!':
-            data['data'] = {}
-        elif data['stat'] == 'OK':
+        if data['stat'] == 'OK':
             data['data'] = self.purify(data)
+        else:
+            data['data'] = []
         return data
 
     def _convert_date(self, date):
