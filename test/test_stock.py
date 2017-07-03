@@ -20,7 +20,7 @@ class FetcherTest(object):
         self.assertEqual(dt.high, 199.0)
         self.assertEqual(dt.low, 195.5)
         self.assertEqual(dt.close, 196.5)
-        self.assertEqual(dt.ratio, 2.0)
+        self.assertEqual(dt.change, 2.0)
         self.assertEqual(dt.transaction, 15718)
 
 
@@ -42,7 +42,7 @@ class TPEXFetcherTest(unittest.TestCase, FetcherTest):
         self.assertEqual(dt.high, 199.0)
         self.assertEqual(dt.low, 195.5)
         self.assertEqual(dt.close, 196.5)
-        self.assertEqual(dt.ratio, 2.0)
+        self.assertEqual(dt.change, 2.0)
         self.assertEqual(dt.transaction, 15718)
 
 
@@ -51,6 +51,21 @@ class StockTest(object):
         self.stk.fetch_31()
         self.assertEqual(len(self.stk.data), 31)
         self.assertEqual(len(self.stk.price), 31)
+
+    def test_date(self):
+        self.assertIsInstance(self.stk.date, list)
+        self.assertEqual(len(self.stk.date), len(self.stk.data))
+        self.assertEqual(self.stk.date, [d.date for d in self.stk.data])
+
+    def test_capacity(self):
+        self.assertIsInstance(self.stk.capacity, list)
+        self.assertEqual(len(self.stk.capacity), len(self.stk.data))
+        self.assertEqual(self.stk.capacity, [d.capacity for d in self.stk.data])
+
+    def test_turnover(self):
+        self.assertIsInstance(self.stk.turnover, list)
+        self.assertEqual(len(self.stk.turnover), len(self.stk.data))
+        self.assertEqual(self.stk.turnover, [d.turnover for d in self.stk.data])
 
     def test_price(self):
         self.assertIsInstance(self.stk.price, list)
@@ -72,10 +87,20 @@ class StockTest(object):
         self.assertEqual(len(self.stk.open), len(self.stk.data))
         self.assertEqual(self.stk.open, [d.open for d in self.stk.data])
 
-    def test_capacity(self):
-        self.assertIsInstance(self.stk.capacity, list)
-        self.assertEqual(len(self.stk.capacity), len(self.stk.data))
-        self.assertEqual(self.stk.capacity, [d.capacity for d in self.stk.data])
+    def test_close(self):
+        self.assertIsInstance(self.stk.close, list)
+        self.assertEqual(len(self.stk.close), len(self.stk.data))
+        self.assertEqual(self.stk.close, [d.close for d in self.stk.data])
+
+    def test_change(self):
+        self.assertIsInstance(self.stk.change, list)
+        self.assertEqual(len(self.stk.change), len(self.stk.data))
+        self.assertEqual(self.stk.change, [d.change for d in self.stk.data])
+
+    def test_transaction(self):
+        self.assertIsInstance(self.stk.transaction, list)
+        self.assertEqual(len(self.stk.transaction), len(self.stk.data))
+        self.assertEqual(self.stk.transaction, [d.transaction for d in self.stk.data])
 
 
 class TWSEStockTest(unittest.TestCase, StockTest):

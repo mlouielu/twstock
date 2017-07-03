@@ -17,7 +17,7 @@ except ImportError:
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
 TPEX_BASE_URL = 'http://www.tpex.org.tw/'
 DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
-                                'high', 'low', 'close', 'ratio', 'transaction'])
+                                'high', 'low', 'close', 'change', 'transaction'])
 
 
 class TWSEFetcher(object):
@@ -137,6 +137,18 @@ class Stock(analytics.Analytics):
         return self.data
 
     @property
+    def date(self):
+        return [d.date for d in self.data]
+
+    @property
+    def capacity(self):
+        return [d.capacity for d in self.data]
+
+    @property
+    def turnover(self):
+        return [d.turnover for d in self.data]
+
+    @property
     def price(self):
         return [d.close for d in self.data]
 
@@ -153,5 +165,13 @@ class Stock(analytics.Analytics):
         return [d.open for d in self.data]
 
     @property
-    def capacity(self):
-        return [d.capacity for d in self.data]
+    def close(self):
+        return [d.close for d in self.data]
+
+    @property
+    def change(self):
+        return [d.change for d in self.data]
+
+    @property
+    def transaction(self):
+        return [d.transaction for d in self.data]
