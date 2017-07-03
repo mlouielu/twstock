@@ -2,6 +2,9 @@
 Status](https://travis-ci.org/mlouielu/twstock.svg?branch=master)](https://travis-ci.org/mlouielu/twstock)
 [![Coverage Status](https://coveralls.io/repos/github/mlouielu/twstock/badge.svg?branch=master)](https://coveralls.io/github/mlouielu/twstock?branch=master)
 
+**Currently under heavily design, please *don't* consider API will be stable at this moment.**
+
+
 twstock 台灣股市股票價格擷取
 ----------------------------
 
