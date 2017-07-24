@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import random
 import json
 import time
 import requests
