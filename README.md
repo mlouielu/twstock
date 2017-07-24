@@ -19,6 +19,10 @@ twstock 台灣股市股票價格擷取
 * [證券交易所 (TWSE)](http://www.twse.com.tw)
 * [證券櫃台買賣中心 (TPEX)](http://www.tpex.org.tw)
 
+## Documentation
+
+* [twstock documentation (正體中文)](http://twstock.readthedocs.io/zh_TW/latest)
+
 ## Requirements
 
 * requests
@@ -89,19 +93,6 @@ stock.fetch_from(2015, 1)
 Data(date=datetime.datetime(2017, 5, 18, 0, 0), capacity=22490217, turnover=4559780051, open=202.5, high=204.0, low=201.5, close=203.5, change=-0.5, transaction=6983)
 ```
 
-Data tuple 命名
-
-```
-date        = 日期
-capacity    = 總成交股數
-turnover    = 總成交金額
-open        = 開盤價
-high        = 最高價
-low         = 最低價
-close       = 收盤價
-change      = 漲跌價差
-transaction = 成交筆數
-```
 
 台股證券編碼
 
@@ -137,58 +128,6 @@ import twstock
 
 twstock.realtime.get('2330')    # 擷取當前台積電股票資訊
 twstock.realtime.get(['2330', '2337', '2409'])  # 擷取當前三檔資訊
-```
-
-```
-realtime data field
-
-{
-   "timestamp":1500860849.0,
-   "info":{
-      "code":"2330",
-      "channel":"2330.tw",
-      "name":"台積電",
-      "fullname":"台灣積體電路製造股份有限公司",
-      "time":"2017-07-24 09:47:29"
-   },
-   "realtime":{
-      "latest_trade_price":"214.50",
-      "trade_volume":"1",
-      "accumulate_trade_volume":"5094",
-      "best_bid_price":[
-         "214.00",
-         "213.50",
-         "213.00",
-         "212.50",
-         "212.00"
-      ],
-      "best_bid_volume":[
-         "1221",
-         "1530",
-         "817",
-         "1038",
-         "1193"
-      ],
-      "best_ask_price":[
-         "214.50",
-         "215.00",
-         "215.50",
-         "216.00",
-         "216.50"
-      ],
-      "best_ask_volume":[
-         "853",
-         "1193",
-         "972",
-         "1209",
-         "817"
-      ],
-      "open":"213.50",
-      "high":"214.50",
-      "low":"213.00"
-   },
-   "success":true
-}
 ```
 
 
