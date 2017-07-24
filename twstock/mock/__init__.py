@@ -61,3 +61,10 @@ stock_list = {
 
 def get_stock_info(stock_id, index=0):
     return json.loads(stock_list[stock_id][index])
+
+
+def get_stocks_info(stocks):
+    data = json.loads(stock_list['2330'][0])
+    for _ in range(len(stocks)):
+        data['msgArray'].append(data['msgArray'][0])
+    return data

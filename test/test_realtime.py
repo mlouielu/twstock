@@ -13,3 +13,32 @@ class RealtimeTest(unittest.TestCase):
 
     def test_realtime_get_raw(self):
         self.assertIn('msgArray', realtime.get_raw('2330'))
+
+
+class MockRealtimeTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        realtime.mock = True
+
+    @classmethod
+    def tearDownClass(cls):
+        realtime.mock = False
+
+    def test_mock_one_stock_id(self):
+        s = realtime.get('2330')
+
+        self.assertTrue(s['success'])
+        self.assertEqual(s['info']['code'], '2330')
+        self.assertEqual(s['realtime']['latest_trade_price'], '214.50')
+        self.assertEqual(s['realtime']['best_bid_price'],
+                         ['214.00', '213.50', '213.00', '212.50', '212.00'])
+
+    def test_mock_multiple_stock_id(self):
+        s = realtime.get(['2330', '2337'])
+
+        self.assertTrue(s['success'])
+        self.assertCountEqual(s.keys(), ['2330', '2337', 'success'])
+        self.assertTrue(s['2330']['success'])
+        self.assertEqual(s['2330']['info']['code'], '2330')
+        self.assertEqual(s['2330']['realtime']['latest_trade_price'], '214.50')
+        self.assertTrue(s['2337']['success'])

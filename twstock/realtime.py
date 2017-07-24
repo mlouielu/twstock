@@ -5,13 +5,17 @@ import random
 import json
 import time
 import requests
+import twstock.mock
 
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
 STOCKINFO_URL = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
 
+# Mock data
+mock = False
 
-def _format_stock_info(data):
+
+def _format_stock_info(data) -> dict:
     result = {
         'timestamp': 0.0,
         'info': {},
@@ -47,13 +51,13 @@ def _format_stock_info(data):
     return result
 
 
-def _join_stock_id(stocks):
+def _join_stock_id(stocks) -> str:
     if isinstance(stocks, list):
         return '|'.join(['tse_{}.tw'.format(s) for s in stocks])
     return 'tse_{stock_id}.tw'.format(stock_id=stocks)
 
 
-def get_raw(stocks):
+def get_raw(stocks) -> dict:
     req = requests.Session()
     req.get(SESSION_URL)
 
@@ -68,7 +72,13 @@ def get_raw(stocks):
 
 
 def get(stocks, retry=3):
-    data = get_raw(stocks)
+    if mock:
+        if isinstance(stocks, list):
+            data = twstock.mock.get_stocks_info(stocks)
+        else:
+            data = twstock.mock.get_stock_info(stocks)
+    else:
+        data = get_raw(stocks)
 
     # Add success
     data['success'] = False
@@ -83,6 +93,11 @@ def get(stocks, retry=3):
 
     # Return multiple stock data
     if isinstance(stocks, list):
-        return list(map(_format_stock_info, data['msgArray']))
+        result = {
+            stock_id: data for stock_id, data in zip(
+                stocks, map(_format_stock_info, data['msgArray']))
+        }
+        result['success'] = True
+        return result
 
     return _format_stock_info(data['msgArray'][0])
