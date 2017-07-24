@@ -38,7 +38,7 @@ class RealtimeTest(unittest.TestCase):
         stock = realtime.get('6223')
 
         self.assertTrue(stock['success'])
-        self.assertEqual(stock['info']['c'], '6223')
+        self.assertEqual(stock['info']['code'], '6223')
 
 
 class MockRealtimeTest(unittest.TestCase):
