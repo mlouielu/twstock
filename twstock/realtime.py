@@ -32,17 +32,23 @@ def _format_stock_info(data) -> dict:
     result['info']['time'] = datetime.datetime.fromtimestamp(
         int(data['tlong']) / 1000).strftime('%Y-%m-%d %H:%M:%S')
 
+    # Process best result
+    def _split_best(d):
+        if d:
+            return d.strip('_').split('_')
+        return d
+
     # Realtime information
-    result['realtime']['latest_trade_price'] = data['z']
-    result['realtime']['trade_volume'] = data['tv']
-    result['realtime']['accumulate_trade_volume'] = data['v']
-    result['realtime']['best_bid_price'] = data['b'].strip('_').split('_')
-    result['realtime']['best_bid_volume'] = data['g'].strip('_').split('_')
-    result['realtime']['best_ask_price'] = data['a'].strip('_').split('_')
-    result['realtime']['best_ask_volume'] = data['f'].strip('_').split('_')
-    result['realtime']['open'] = data['o']
-    result['realtime']['high'] = data['h']
-    result['realtime']['low'] = data['l']
+    result['realtime']['latest_trade_price'] = data.get('z', None)
+    result['realtime']['trade_volume'] = data.get('tv', None)
+    result['realtime']['accumulate_trade_volume'] = data.get('v', None)
+    result['realtime']['best_bid_price'] = _split_best(data.get('b', None))
+    result['realtime']['best_bid_volume'] = _split_best(data.get('g', None))
+    result['realtime']['best_ask_price'] = _split_best(data.get('a', None))
+    result['realtime']['best_ask_volume'] = _split_best(data.get('f', None))
+    result['realtime']['open'] = data.get('o', None)
+    result['realtime']['high'] = data.get('h', None)
+    result['realtime']['low'] = data.get('l', None)
 
     # Success fetching
     result['success'] = True
@@ -100,8 +106,7 @@ def get(stocks, retry=3):
     # Return multiple stock data
     if isinstance(stocks, list):
         result = {
-            stock_id: data for stock_id, data in zip(
-                stocks, map(_format_stock_info, data['msgArray']))
+            data['info']['code']: data for data in map(_format_stock_info, data['msgArray'])
         }
         result['success'] = True
         return result
