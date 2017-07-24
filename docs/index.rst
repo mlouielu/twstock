@@ -17,6 +17,7 @@ twstock - 台灣股市股票價格擷取
 
 
 .. toctree::
+   prepare.rst
    quickstart.rst
    reference/index.rst
 
