@@ -11,10 +11,10 @@
 認識 Stock
 ==========
 
-在 twstock 之中，我們可以使用 :class:`Stock` 來取得歷史股票資訊。
+在 twstock 之中，我們可以使用 :py:class:`Stock` 來取得歷史股票資訊。
 
 歷史資料
--------
+---------
 
 舉例而言::
 
@@ -47,7 +47,7 @@
     datetime.datetime(2017, 7, 24, 0, 0)]
 
 獲取其他日期之資料
----------------
+-------------------
 
 同時，:class:`Stock` 預設建立時會取得近 31 日開盤之資料，如果需要其他日期之資料，可透過
 不同之 fetch 功能獲得::
@@ -59,7 +59,7 @@
 
 
 基本股票資訊分析
--------------
+-----------------
 
 :class:`Stock` 內建基本股票分析功能，可以透過這些 method 來使用::
 
@@ -85,4 +85,183 @@
     2.700000000000017, 2.0999999999999943, 1.5, 0.9499999999999886]
 
 
+認識 BestFourPoint
+==================
 
+四大買賣點判斷來自 toomore/grs 之中的一個功能，透過四大買賣點來判斷是否要
+買賣股票。四個買賣點分別為：
+
+   * 量大收紅 / 量大收黑
+   * 量縮價不跌 / 量縮價跌
+   * 三日均價由下往上 / 三日均價由上往下
+   * 三日均價大於六日均價 / 三日均價小於六日均價
+
+使用範例如下::
+
+   >>> stock = twstock.Stock('2330')
+   >>> bfp = twstock.BestFourPoint(stock)
+   >>> bfp.best_four_point_to_buy()   # 判斷是否為四大買點
+   '量大收紅, 三日均價大於六日均價'
+   >>> bfp.best_four_point_to_sell()  # 判斷是否為四大賣點
+   False
+   >>> bfp.best_four_point()          # 綜合判斷
+   (True, '量大收紅, 三日均價大於六日均價')
+
+.. note::
+
+   ``BestFourPoint`` 是 ``Stock`` 的一層 wrapper，如果更動
+   ``Stock`` 之資料，將會直接影響 ``BestFourPoint`` 之結果，請特別注意。
+
+
+認識 realtime
+===============
+
+:py:mod:`realtime` 可以取得當前股票市場之即時資訊，可查詢上市以及上櫃之資料。
+同時可以透過 :py:attr:`realtime.mock` 來設定是否使用假資料。
+
+
+取得單一股票之即時資料
+----------------------
+
+使用 :mod:`realtime` 取得台積電 (2330) 之即時股票資料::
+
+   >>> import twstock
+   >>> stock = twstock.realtime.get('2330')  # 查詢上市股票之即時資料
+   {
+      "timestamp": 1500877800.0,
+      "info": {
+         "code": "2330",
+         "channel": "2330.tw",
+         "name": "台積電",
+         "fullname": "台灣積體電路製造股份有限公司",
+         "time": "2017-07-24 14:30:00"
+      },
+      "realtime": {
+         "latest_trade_price": "214.50",
+         "trade_volume": "4437",
+         "accumulate_trade_volume": "19955",
+         "best_bid_price": [
+               "214.00",
+               "213.50",
+               "213.00",
+               "212.50",
+               "212.00"
+         ],
+         "best_bid_volume": [
+               "29",
+               "1621",
+               "2056",
+               "1337",
+               "1673"
+         ],
+         "best_ask_price": [
+               "214.50",
+               "215.00",
+               "215.50",
+               "216.00",
+               "216.50"
+         ],
+         "best_ask_volume": [
+               "736",
+               "3116",
+               "995",
+               "1065",
+               "684"
+         ],
+         "open": "213.50",
+         "high": "214.50",
+         "low": "213.00"
+      },
+      "success": true
+   }
+   >>> stock = twstock.realtime.get('6223')  # 查詢上櫃股票之即時資料
+   >>> stock
+   {'timestamp': 1500877800.0, 'info': {'code': '6223', 'channel': '6223.tw',
+    'name': '旺矽', 'fullname': '旺矽科技股份有限公司', 'time': '2017-07-24 14:30:00'},
+    'realtime': ..., 'success': True}
+
+
+透過 `success` 確認資料之正確性
+-------------------------------
+
+使用 :mod:`realtime` 之資料時，需先確認 ``success`` 是否為 ``True``，
+如果為 ``False`` 代表取得之資料有誤或是有錯誤產生，請再度參照 ``rtmessage``
+取得錯誤訊息、``rtcode`` 取得錯誤代碼::
+
+   >>> stock = twstock.realtime.get('2330')
+   >>> stock['success']
+   True
+   >>> stock = twstock.realtime.get('')
+   >>> stock['success']
+   False
+   >>> stock
+   {'rtmessage': 'Information Data Not Found.', 'rtcode': '9999',
+    'success': False}
+   >>> stock = twstock.realtime.get('9999')
+   >>> stock['success']
+   False
+   >>> stock
+   {'msgArray': [], 'userDelay': 0, 'rtmessage': 'Empty Query.',
+    'referer': '', 'queryTime': {'sysTime': '17:27:02',
+   'sessionLatestTime': -1, 'sysDate': '20170724', 'sessionKey':
+   'tse_9999.tw_20170724|', 'sessionFromTime': -1, 'stockInfoItem': 1719,
+   'showChart': False, 'sessionStr': 'UserSession', 'stockInfo': 277019},
+   'rtcode': '5001', 'success': False}
+
+多股票即時資料查詢
+------------------
+
+:mod:`realtime` 支援多個股票同時查詢::
+
+   >>> stocks = twstock.realtime.get(['2330', '2337', '2409'])
+   >>> stocks['success']
+   >>> stocks
+   {'2330': {'timestamp': 1500877800.0, ..., 'success': True},
+    '2337': {'timestamp': 1500877800.0, ..., 'success': True},
+    '2409': {'timestamp': 1500877800.0, ..., 'success': True},
+    'success': True}
+   >>> stocks['2330']['success']
+   True
+
+
+使用 ``mock``
+--------------
+
+    >>> twstock.realtime.mock = True
+    >>> twstock.realtime.get('2337')
+
+
+認識 Codes
+===========
+
+:mod:`codes` 提供了台灣股票代號之查詢，分別為 :py:data:`codes.tpex`、:py:data:`codes.twse`、:py:data:`codes.codes`。
+
+
+查詢代號是否為上市股票::
+
+   >>> import twstock
+   >>> '2330' in twstock.twse
+   True
+   >>> '6223' in twstock.twse
+   False
+
+查詢代號是否為上櫃股票::
+
+   >>> '2330' in twstock.twse
+   False
+   >>> '6223' in twstock.twse
+   True
+
+查詢代號是否為台灣股票代號::
+
+   >>> '2330' in twstock.codes
+   True
+   >>> '6223' in twstock.codes
+   True
+
+
+認識 Legacy
+============
+
+:py:mod:`Legacy` 用於初期自 ``toomore/grs`` 銜接驗證使用，包含兩組 grs 重要功能之驗證，
+分別為 :class:`LegacyAnalytics` 以及 :class:`LegacyBestFourPoint`。

@@ -5,3 +5,5 @@ API
 
 .. toctree::
     stock.rst
+    realtime.rst
+    codes.rst

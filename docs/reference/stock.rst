@@ -56,7 +56,7 @@
 :class:`Stock`
 --------------
 
-.. class:: twstock.Stock(stock_id: str)
+.. class:: Stock(stock_id: str)
 
    有關股票歷史資訊 (開/收盤價，交易量，日期...etc) 以及簡易股票分析。
    建立 :class:`Stock` 實例時，會自動呼叫 :meth:`fetch_31` 抓取近 31 日
