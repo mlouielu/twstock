@@ -7,6 +7,9 @@
 自動給予正確的 fetcher。
 
 
+:class:`DATATUPLE`
+------------------
+
 .. class:: DATATUPLE(date, capacity, turnover, open, high, low, close, change, transaction)
 
    歷史資料之 `nametuple`。
@@ -49,6 +52,9 @@
 
       成交筆數。
 
+
+:class:`Stock`
+--------------
 
 .. class:: twstock.Stock(stock_id: str)
 
@@ -107,6 +113,9 @@
 
       判斷正負乖離。
 
+
+:class:`Fetcher`
+----------------
 
 .. class:: BaseFetcher
 
