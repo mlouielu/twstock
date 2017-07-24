@@ -18,17 +18,23 @@ TPEX_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, 'codes', 'tpex_equities
 TWSE_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, 'codes', 'twse_equities.csv')
 
 codes = {}
+tpex = {}
+twse = {}
 
 
-def read_csv(path):
-    global codes
+def read_csv(path, types):
+    global codes, twse, tpex
     with open(path, newline='') as csvfile:
         reader = csv.reader(csvfile)
         csvfile.readline()
         for row in reader:
             row = ROW(*row)
             codes[row.code] = row
+            if types == 'tpex':
+                tpex[row.code] = row
+            else:
+                twse[row.code] = row
 
 
-read_csv(TPEX_EQUITIES_CSV_PATH)
-read_csv(TWSE_EQUITIES_CSV_PATH)
+read_csv(TPEX_EQUITIES_CSV_PATH, 'tpex')
+read_csv(TWSE_EQUITIES_CSV_PATH, 'twse')
