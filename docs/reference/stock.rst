@@ -1,7 +1,10 @@
-:class:`Stock` --- 股票歷史資訊
+:mod:`stock` --- 股票歷史資訊
 =================================
 
-:class:`Stock` 包含三個重要的元素： :class:`DATATUPLE` 負責建立歷史股票資料之 ``namedtuple``、
+.. module:: stock
+
+
+:mod:`stock` 包含三個重要的元素： :class:`DATATUPLE` 負責建立歷史股票資料之 ``namedtuple``、
 :class:`BaseFetcher` 作為 :class:`TWSEFetcher` 以及 :class:`TPEXFetcher` 之基底 class、
 :class:`Stock` 封裝整個歷史股票資訊供使用者使用，同時 :class:`Stock` 會針對上市或上櫃的股票代號
 自動給予正確的 fetcher。
