@@ -127,6 +127,68 @@ bfp.best_four_point_to_sell()   # 判斷是否為四大賣點
 bfp.best_four_point()           # 綜合判斷
 ```
 
+## 即時股票資訊查詢
+
+```
+import twstock
+
+twstock.realtime.get('2330')    # 擷取當前台積電股票資訊
+twstock.realtime.get(['2330', '2337', '2409'])  # 擷取當前三檔資訊
+```
+
+```
+realtime data field
+
+{
+   "timestamp":1500860849.0,
+   "info":{
+      "code":"2330",
+      "channel":"2330.tw",
+      "name":"台積電",
+      "fullname":"台灣積體電路製造股份有限公司",
+      "time":"2017-07-24 09:47:29"
+   },
+   "realtime":{
+      "latest_trade_price":"214.50",
+      "trade_volume":"1",
+      "accumulate_trade_volume":"5094",
+      "best_bid_price":[
+         "214.00",
+         "213.50",
+         "213.00",
+         "212.50",
+         "212.00"
+      ],
+      "best_bid_volume":[
+         "1221",
+         "1530",
+         "817",
+         "1038",
+         "1193"
+      ],
+      "best_ask_price":[
+         "214.50",
+         "215.00",
+         "215.50",
+         "216.00",
+         "216.50"
+      ],
+      "best_ask_volume":[
+         "853",
+         "1193",
+         "972",
+         "1209",
+         "817"
+      ],
+      "open":"213.50",
+      "high":"214.50",
+      "low":"213.00"
+   },
+   "success":true
+}
+```
+
+
 ## 使用範例
 
 * [tw-stocker](https://github.com/mlouielu/stocker)
