@@ -21,7 +21,7 @@ twstock 設計僅支援 Python 3 以上之版本，目前最新版 Python 3.6.2 
 `twstock gitter.im <https://gitter.im/twstock/Lobby>`_ 詢問。
 
 
-User's Guide
+使用指南 - User's Guide
 ------------
 
 .. toctree::
@@ -30,7 +30,7 @@ User's Guide
 
 
 
-API Reference
+API 參照索引 - API Reference
 -------------
 
 如果你正在尋找某個特定指令、class 或 method 的介紹，請參照
@@ -40,7 +40,7 @@ API Reference
    reference/index.rst
 
 
-Additional Notes
+額外資訊 - Additional Notes
 ----------------
 
 .. toctree::
