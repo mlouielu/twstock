@@ -1,6 +1,12 @@
 :class:`Stock` --- 股票歷史資訊
 =================================
 
+:class:`Stock` 包含三個重要的元素： :class:`DATATUPLE` 負責建立歷史股票資料之 ``namedtuple``、
+:class:`BaseFetcher` 作為 :class:`TWSEFetcher` 以及 :class:`TPEXFetcher` 之基底 class、
+:class:`Stock` 封裝整個歷史股票資訊供使用者使用，同時 :class:`Stock` 會針對上市或上櫃的股票代號
+自動給予正確的 fetcher。
+
+
 .. class:: DATATUPLE(date, capacity, turnover, open, high, low, close, change, transaction)
 
    歷史資料之 `nametuple`。
@@ -73,30 +79,63 @@
 
    .. method:: fetch(self, year: int, month: int)
 
-      擷取該年、月份之歷史股票資料
+      擷取該年、月份之歷史股票資料。
 
    .. method:: fetch_from(self, year: int, month: int)
 
-      擷取自該年、月至今日之歷史股票資料
+      擷取自該年、月至今日之歷史股票資料。
 
    .. method:: fetch_31(self)
 
-      擷取近 31 日開盤之歷史股票資料
+      擷取近 31 日開盤之歷史股票資料。
 
    分析 method:
 
    .. method:: continuous(self, data)
 
-      ``data`` 之持續上升天數
+      ``data`` 之持續上升天數。
 
    .. method:: moving_average(self, days: int, data)
 
-      ``data`` 之 ``days`` 日均數值
+      ``data`` 之 ``days`` 日均數值。
 
    .. method:: ma_bias_ratio(self, day1, day2)
 
-      計算 ``day1`` 日以及 ``day2`` 之乖離值
+      計算 ``day1`` 日以及 ``day2`` 之乖離值。
 
    .. method:: ma_bias_ratio_pivot(self, data, sample_size=5, position=False)
 
-      判斷正負乖離
+      判斷正負乖離。
+
+
+.. class:: BaseFetcher
+
+   .. method:: fetch(self, year, month, sid, retry)
+
+      抓取相對應年月份之股票資料。
+
+   .. method:: _convert_date(self, date)
+
+      回傳西元記年，將民國記年轉換為西元記年。舉例而言::
+
+         >>> date = self._convert_date('106/05/01')
+         >>> print(date)
+         '2017/05/01'
+
+   .. method:: _make_datatuple(self, data)
+
+      將相對應之單日資料轉換為 :class:`DATATUPLE`。會將對應之資料轉換為對應型態。
+
+   .. method:: purify(self, original_data: list)
+
+      將 ``original_data`` 內之所有資料轉換為 :class:`DATATUPLE` 型態。
+
+
+.. class:: TWSEFetcher(BaseFetcher)
+
+   台灣上市股票抓取
+
+
+.. class:: TPEXFetcher(BaseFetcher)
+
+   台灣上櫃股票抓取
