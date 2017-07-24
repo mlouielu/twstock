@@ -15,8 +15,8 @@ def run():
     args = parser.parse_args()
 
     if args.bfp:
-        cli.best_four_point.run(args.bfp)
+        best_four_point.run(args.bfp)
     elif args.stock:
-        cli.stock.run(args.stock)
+        stock.run(args.stock)
     elif args.realtime:
-        cli.realtime.run(args.realtime)
+        realtime.run(args.realtime)
