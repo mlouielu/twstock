@@ -21,7 +21,22 @@ DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
                                 'high', 'low', 'close', 'change', 'transaction'])
 
 
-class TWSEFetcher(object):
+class BaseFetcher(object):
+    def fetch(self, year, month, sid, retry):
+        pass
+
+    def _convert_date(self, date):
+        """Convert '106/05/01' to '2017/05/01'"""
+        return '/'.join([str(int(date.split('/')[0]) + 1911)] + date.split('/')[1:])
+
+    def _make_datatuple(self, data):
+        pass
+
+    def purify(self, original_data):
+        pass
+
+
+class TWSEFetcher(BaseFetcher):
     REPORT_URL = urllib.parse.urljoin(TWSE_BASE_URL, 'exchangeReport/STOCK_DAY')
 
     def __init__(self):
@@ -43,10 +58,6 @@ class TWSEFetcher(object):
             data['data'] = []
         return data
 
-    def _convert_date(self, date):
-        """Convert '106/05/01' to '2017/05/01'"""
-        return '/'.join([str(int(date.split('/')[0]) + 1911)] + date.split('/')[1:])
-
     def _make_datatuple(self, data):
         data[0] = datetime.datetime.strptime(self._convert_date(data[0]), '%Y/%m/%d')
         data[1] = int(data[1].replace(',', ''))
@@ -63,7 +74,7 @@ class TWSEFetcher(object):
         return [self._make_datatuple(d) for d in original_data['data']]
 
 
-class TPEXFetcher(object):
+class TPEXFetcher(BaseFetcher):
     REPORT_URL = urllib.parse.urljoin(TPEX_BASE_URL,
                                       'web/stock/aftertrading/daily_trading_info/st43_result.php')
 
