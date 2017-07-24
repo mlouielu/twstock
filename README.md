@@ -1,7 +1,7 @@
 [![Build
 Status](https://travis-ci.org/mlouielu/twstock.svg?branch=master)](https://travis-ci.org/mlouielu/twstock)
 [![Coverage Status](https://coveralls.io/repos/github/mlouielu/twstock/badge.svg?branch=master)](https://coveralls.io/github/mlouielu/twstock?branch=master)
-[![Documentation Status](https://readthedocs.org/projects/twstock/badge/?version=latest)](http://twstock.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/twstock/badge/?version=latest)](http://twstock.readthedocs.io/zh_TW/latest/?badge=latest)
 
 
 **Currently under heavily design, please *don't* consider API will be stable at this moment.**
