@@ -5,7 +5,6 @@ import twstock
 from twstock import realtime
 
 
-@unittest.skip('just skip')
 class RealtimeTest(unittest.TestCase):
     def test_realtime_field(self):
         self.assertCountEqual(
@@ -14,6 +13,26 @@ class RealtimeTest(unittest.TestCase):
 
     def test_realtime_get_raw(self):
         self.assertIn('msgArray', realtime.get_raw('2330'))
+
+    def test_realtime_get_blank(self):
+        stock = realtime.get('')
+
+        self.assertFalse(stock['success'])
+        self.assertIn('rtmessage', stock)
+        self.assertIn('rtcode', stock)
+
+    def test_realtime_get_bad_id(self):
+        stock = realtime.get('9999')
+
+        self.assertFalse(stock['success'])
+        self.assertIn('rtmessage', stock)
+        self.assertIn('rtcode', stock)
+
+        stock = realtime.get(['9999', '8888'])
+
+        self.assertFalse(stock['success'])
+        self.assertIn('rtmessage', stock)
+        self.assertIn('rtcode', stock)
 
 
 class MockRealtimeTest(unittest.TestCase):

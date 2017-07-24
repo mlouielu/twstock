@@ -64,10 +64,11 @@ def get_raw(stocks) -> dict:
         STOCKINFO_URL.format(
             stock_id=_join_stock_id(stocks),
             time=int(time.time()) * 1000))
+
     try:
         return r.json()
     except json.decoder.JSONDecodeError:
-        return {'rtmessage': 'json decode error', 'rtcode': '0001'}
+        return {'rtmessage': 'json decode error', 'rtcode': '5000'}
 
 
 def get(stocks, retry=3):
@@ -79,15 +80,24 @@ def get(stocks, retry=3):
     else:
         data = get_raw(stocks)
 
-    # Add success
+    # Set success
     data['success'] = False
 
-    if (data['rtcode'] == '0001' or
-            data['rtcode'] != '0000' or
-            'msgArray' not in data):
+    # JSONdecode error, could be too fast, retry
+    if data['rtcode'] == '5000':
         # XXX: Stupit retry, you will dead here
         if retry:
             return get(stocks, retry - 1)
+        return data
+
+    # No msgArray, dead
+    if 'msgArray' not in data:
+        return data
+
+    # Check have data
+    if not len(data['msgArray']):
+        data['rtmessage'] = 'Empty Query.'
+        data['rtcode'] = '5001'
         return data
 
     # Return multiple stock data
