@@ -74,13 +74,8 @@ def get_raw(stocks) -> dict:
 
 
 def get(stocks, retry=3):
-    if mock:
-        if isinstance(stocks, list):
-            data = twstock.mock.get_stocks_info(stocks)
-        else:
-            data = twstock.mock.get_stock_info(stocks)
-    else:
-        data = get_raw(stocks)
+    # Prepare data
+    data = get_raw(stocks) if not mock else twstock.mock.get(stocks)
 
     # Set success
     data['success'] = False

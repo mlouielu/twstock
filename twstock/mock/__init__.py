@@ -68,3 +68,9 @@ def get_stocks_info(stocks):
     for _ in range(len(stocks)):
         data['msgArray'].append(data['msgArray'][0])
     return data
+
+def get(stocks):
+    if isinstance(stocks, list):
+        return get_stocks_info(stocks)
+    return get_stock_info(stocks)
+
