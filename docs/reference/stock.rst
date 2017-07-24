@@ -5,6 +5,8 @@
 
    歷史資料之 `nametuple`。
 
+   Attributes:
+
    .. attribute:: date
 
       ``datetime.datetime`` 格式之時間，例如 ``datetime.datetime(2017, 6, 12, 0, 0)``。
@@ -49,13 +51,15 @@
    之歷史股票資料。
 
 
+   Class attributes are:
+
    .. attribute:: sid
 
       股票代號。
 
    .. attribute:: fetcher
 
-      抓取方式。
+      抓取方式之 instance，程式會自動判斷上櫃或上市，使用相對應之 fetcher。
 
    .. attribute:: raw_data
 
@@ -64,6 +68,8 @@
    .. attribute:: data
 
       將 :attr:`raw_data` 透過 :class:`DATATUPLE` 處理之歷史股票資料。
+
+   Fetcher method:
 
    .. method:: fetch(self, year: int, month: int)
 
@@ -76,6 +82,8 @@
    .. method:: fetch_31(self)
 
       擷取近 31 日開盤之歷史股票資料
+
+   分析 method:
 
    .. method:: continuous(self, data)
 
