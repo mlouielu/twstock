@@ -34,6 +34,12 @@ class RealtimeTest(unittest.TestCase):
         self.assertIn('rtmessage', stock)
         self.assertIn('rtcode', stock)
 
+    def test_realtime_get_tpex_id(self):
+        stock = realtime.get('6223')
+
+        self.assertTrue(stock['success'])
+        self.assertEqual(stock['info']['c'], '6223')
+
 
 class MockRealtimeTest(unittest.TestCase):
     @classmethod

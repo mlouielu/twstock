@@ -4,7 +4,7 @@ import datetime
 import json
 import time
 import requests
-import twstock.mock
+import twstock
 
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
@@ -52,8 +52,10 @@ def _format_stock_info(data) -> dict:
 
 def _join_stock_id(stocks) -> str:
     if isinstance(stocks, list):
-        return '|'.join(['tse_{}.tw'.format(s) for s in stocks])
-    return 'tse_{stock_id}.tw'.format(stock_id=stocks)
+        return '|'.join(['{}_{}.tw'.format(
+            'tse' if s in twstock.twse else 'otc', s) for s in stocks])
+    return '{}_{stock_id}.tw'.format(
+        'tse' if stocks in twstock.twse else 'otc', stock_id=stocks)
 
 
 def get_raw(stocks) -> dict:
