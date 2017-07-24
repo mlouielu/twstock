@@ -1,7 +1,8 @@
-from . import stock
-from . import analytics
-from . import cli
+from twstock import stock
+from twstock import analytics
+from twstock import cli
+from twstock import mock
 
-from .analytics import BestFourPoint
-from .codes import codes
-from .stock import Stock
+from twstock.analytics import BestFourPoint
+from twstock.codes import codes
+from twstock.stock import Stock
