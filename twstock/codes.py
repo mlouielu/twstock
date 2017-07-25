@@ -24,7 +24,7 @@ twse = {}
 
 def read_csv(path, types):
     global codes, twse, tpex
-    with open(path, newline='') as csvfile:
+    with open(path, newline='', encoding='utf_8') as csvfile:
         reader = csv.reader(csvfile)
         csvfile.readline()
         for row in reader:
