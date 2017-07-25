@@ -13,7 +13,7 @@ class Analytics(object):
                 break
         return cont * diff[0]
 
-    def moving_average(self, days, data):
+    def moving_average(self, data, days):
         result = []
         data = data[:]
         for _ in range(len(data) - days + 1):
@@ -23,8 +23,8 @@ class Analytics(object):
 
     def ma_bias_ratio(self, day1, day2):
         """Calculate moving average bias ratio"""
-        data1 = self.moving_average(day1, self.price)
-        data2 = self.moving_average(day2, self.price)
+        data1 = self.moving_average(self.price, day1)
+        data2 = self.moving_average(self.price, day2)
         result = [data1[-i] - data2[-i] for i in range(1, min(len(data1), len(data2)) + 1)]
 
         return result[::-1]
@@ -73,11 +73,11 @@ class BestFourPoint(object):
                 self.stock.price[-1] > self.stock.open[-2])
 
     def best_buy_3(self):
-        return self.stock.continuous(self.stock.moving_average(3, self.stock.price)) == 1
+        return self.stock.continuous(self.stock.moving_average(self.stock.price, 3)) == 1
 
     def best_buy_4(self):
-        return (self.stock.moving_average(3, self.stock.price)[-1] >
-                self.stock.moving_average(6, self.stock.price)[-1])
+        return (self.stock.moving_average(self.stock.price, 3)[-1] >
+                self.stock.moving_average(self.stock.price, 6)[-1])
 
     def best_sell_1(self):
         return (self.stock.capacity[-1] > self.stock.capacity[-2] and
@@ -88,11 +88,11 @@ class BestFourPoint(object):
                 self.stock.price[-1] < self.stock.open[-2])
 
     def best_sell_3(self):
-        return self.stock.continuous(self.stock.moving_average(3, self.stock.price)) == -1
+        return self.stock.continuous(self.stock.moving_average(self.stock.price, 3)) == -1
 
     def best_sell_4(self):
-        return (self.stock.moving_average(3, self.stock.price)[-1] <
-                self.stock.moving_average(6, self.stock.price)[-1])
+        return (self.stock.moving_average(self.stock.price, 3)[-1] <
+                self.stock.moving_average(self.stock.price, 6)[-1])
 
     def best_four_point_to_buy(self):
         result = []
