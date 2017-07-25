@@ -24,7 +24,7 @@ class LegacyAnalytics(object):
                 break
         return cont * diff_data[0]
 
-    def moving_average(self, days, data):
+    def moving_average(self, data, days):
         """ 計算移動平均數
 
             :rtype: 序列 舊→新
@@ -45,8 +45,8 @@ class LegacyAnalytics(object):
             :param int data2: m 日
             :rtype: 序列 舊→新
         """
-        data1 = self.moving_average(date1, data)
-        data2 = self.moving_average(date2, data)
+        data1 = self.moving_average(data, date1)
+        data2 = self.moving_average(data, date2)
         cal_list = []
         for i in range(1, min(len(data1), len(data2)) + 1):
             cal_list.append(data1[-i] - data2[-i])
@@ -119,13 +119,13 @@ class LegacyBestFourPoint(object):
     def best_buy_3(self):
         """三日均價由下往上
         """
-        return self.data.continuous(self.data.moving_average(3, self.data.price)) == 1
+        return self.data.continuous(self.data.moving_average(self.data.price, 3)) == 1
 
     def best_buy_4(self):
         """三日均價大於六日均價
         """
-        return self.data.moving_average(3, self.data.price)[-1] > \
-               self.data.moving_average(6, self.data.price)[-1]
+        return self.data.moving_average(self.data.price, 3)[-1] > \
+               self.data.moving_average(self.data.price, 6)[-1]
 
     ##### 四大賣點 #####
     def best_sell_1(self):
@@ -145,13 +145,13 @@ class LegacyBestFourPoint(object):
     def best_sell_3(self):
         """三日均價由上往下
         """
-        return self.data.continuous(self.data.moving_average(3, self.data.price)) == -1
+        return self.data.continuous(self.data.moving_average(self.data.price, 3)) == -1
 
     def best_sell_4(self):
         """三日均價小於六日均價
         """
-        return self.data.moving_average(3, self.data.price)[-1] < \
-               self.data.moving_average(6, self.data.price)[-1]
+        return self.data.moving_average(self.data.price, 3)[-1] < \
+               self.data.moving_average(self.data.price, 6)[-1]
 
     def best_four_point_to_buy(self):
         """ 判斷是否為四大買點
