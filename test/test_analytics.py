@@ -44,8 +44,8 @@ class AnalyticsTest(unittest.TestCase):
         data = [50, 60, 70, 75]
 
         # Legacy moving_average will affect data argument's data
-        ng_result = self.ng.moving_average(2, data)
-        legacy_result = self.legacy.moving_average(2, data)
+        ng_result = self.ng.moving_average(data, 2)
+        legacy_result = self.legacy.moving_average(data, 2)
         self.assertEqual(ng_result, legacy_result)
         self.assertEqual(ng_result, [55.0, 65.0, 72.5])
 
