@@ -7,6 +7,9 @@ environment:
       PYTHON_VERSION: "3.6.2"
       PYTHON_ARCH: "64"
 
+branches:
+  only:
+    - master
 
 install:
   - "%PYTHON%\\python.exe -m pip install wheel"
