@@ -1,6 +1,6 @@
-[![Build
+[![Travis Build
 Status](https://travis-ci.org/mlouielu/twstock.svg?branch=master)](https://travis-ci.org/mlouielu/twstock)
-[![Build Status](https://ci.appveyor.com/api/projects/status/d03c5laj01ap7qrt?svg=true)](https://ci.appveyor.com/project/mlouielu/twstock)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/d03c5laj01ap7qrt?svg=true)](https://ci.appveyor.com/project/mlouielu/twstock)
 [![Coverage Status](https://coveralls.io/repos/github/mlouielu/twstock/badge.svg?branch=master)](https://coveralls.io/github/mlouielu/twstock?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/twstock/badge/?version=latest)](http://twstock.readthedocs.io/zh_TW/latest/?badge=latest)
 
