@@ -1,0 +1,23 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python34"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.2"
+      PYTHON_ARCH: "64"
+
+
+install:
+  - "%PYTHON%\\python.exe -m pip install wheel"
+  - "%PYTHON%\\python.exe -m pip install flit"
+
+build_script:
+  - "%PYTHON%\\python.exe setup.py build"
+
+test_script:
+  - "%PYTHON%\\python.exe setup.py test"
+
+after_test:
+  - "%PYTHON%\\python.exe -m flit build"
+
