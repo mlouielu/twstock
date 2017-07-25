@@ -18,6 +18,3 @@ build_script:
 test_script:
   - "%PYTHON%\\python.exe setup.py test"
 
-after_test:
-  - "%PYTHON%\\python.exe -m flit build"
-
