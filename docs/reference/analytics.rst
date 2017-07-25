@@ -31,10 +31,12 @@
 
       分析 ``data`` 持續上升之天數。
 
-   .. method:: moving_average(days, data)
+   .. method:: moving_average(data, days)
 
       :param data: 資料樣本
       :type data: list
+      :param days: 天數
+      :type days: int
 
       分析 ``data`` 中之 ``days`` 日之平均數::
 
