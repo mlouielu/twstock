@@ -1,4 +1,6 @@
 environment:
+  global:
+    FLIT_ROOT: C:\projects\flit
   matrix:
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
@@ -14,10 +16,15 @@ branches:
 install:
   - "%PYTHON%\\python.exe -m pip install wheel"
   - "%PYTHON%\\python.exe -m pip install flit"
+  - "git clone https://github.com/mlouielu/flit %FLIT_ROOT%"
+  - "cd %FLIT_ROOT%"
+  - "%PYTHON%\\python.exe -m flit install"
+  - "cd %APPVEYOR_BUILD_FOLDER%"
 
 build_script:
-  - "%PYTHON%\\python.exe setup.py build"
+  - "%PYTHON%\\python.exe -m flit build"
+  - "%PYTHON%\\python.exe -m flit install"
 
 test_script:
-  - "%PYTHON%\\python.exe setup.py test"
+  - "%PYTHON%\\python.exe -m unittest"
 
