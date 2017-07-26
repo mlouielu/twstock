@@ -16,8 +16,8 @@ install:
   - "%PYTHON%\\python.exe -m pip install flit"
 
 build_script:
-  - "flit build"
-  - "flit install"
+  - "%PYTHON%\\python.exe -m flit build"
+  - "%PYTHON%\\python.exe -m flit install"
 
 test_script:
   - "%PYTHON%\\python.exe -m unittest"
