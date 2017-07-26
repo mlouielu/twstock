@@ -5,8 +5,6 @@ Status](https://travis-ci.org/mlouielu/twstock.svg?branch=master)](https://travi
 [![Documentation Status](https://readthedocs.org/projects/twstock/badge/?version=latest)](http://twstock.readthedocs.io/zh_TW/latest/?badge=latest)
 
 
-**Currently under heavily design, please *don't* consider API will be stable at this moment.**
-
 有任何問題歡迎透過 [Gitter.im](https://gitter.im/twstock/Lobby) 詢問。
 
 twstock 台灣股市股票價格擷取
