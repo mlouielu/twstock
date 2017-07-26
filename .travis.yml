@@ -19,10 +19,12 @@ install:
   - pip install -r requirements.txt
   - pip install coveralls
   - pip install codecov
-  - python setup.py install
+  - pip install flit
+  - flit build
+  - flit install
 
 script:
-  - coverage run --source=twstock setup.py test
+  - coverage run --source=twstock -m unittest
 
 after_success:
   - coveralls
