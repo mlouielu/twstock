@@ -13,7 +13,9 @@ branches:
 
 install:
   - "%PYTHON%\\python.exe -m pip install wheel"
-  - "%PYTHON%\\python.exe -m pip install git+https://github.com/takluyver/flit.git"
+  - "%PYTHON%\\python.exe -m pip install flit"
+  - "git clone https://github.com/takluyver/flit"
+  - "cd flit; flit install"
 
 build_script:
   - "%PYTHON%\\python.exe -m flit build"
