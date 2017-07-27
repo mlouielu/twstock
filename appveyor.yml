@@ -2,7 +2,6 @@ environment:
   global:
     FLIT_ROOT: C:\projects\flit
   matrix:
-    - PYTHON: "C:\\Python31"
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
