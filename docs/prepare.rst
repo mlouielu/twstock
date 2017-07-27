@@ -10,7 +10,7 @@
 .. note::
 
     twstock 要求需要 ``Python 3`` 以上之版本！
-    
+
     強烈建議使用 Python 3，別管 Python 2 了。
 
 
@@ -42,6 +42,11 @@
 手動安裝 twstock (透過原始碼)
 ===============================
 
-取得原始碼後，進入 `twstock` 之資料夾，透過下列指令即可安裝 `twstock`::
+取得原始碼後並且進入 `twstock` 之資料夾後，如果沒有安裝過 ``flit``，
+請先透過 ``pip`` 安裝::
 
-    $ python setup.py install
+    $ pip install flit
+
+接著透過 ``flit`` 即可安裝 `twstock`::
+
+    $ flit install
