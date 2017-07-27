@@ -5,7 +5,8 @@ import sys
 import twstock
 
 # XXX: Repalce sys.stdout prevent Windows UnicodeEncodeError on cmd.exe
-stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+stdout = io.TextIOWrapper(
+    getattr(sys.stdout, 'buffer', sys.stdout), encoding='utf-8', errors='replace')
 
 
 def run(argv):
