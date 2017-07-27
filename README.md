@@ -46,7 +46,8 @@ from GitHub:
 ```
 $ git clone https://github.com/mlouielu/twstock
 $ cd twstock
-$ python setup.py install
+$ pip install flit  # If you didn't install flit before
+$ flit install
 ```
 
 ## CLI Tools
