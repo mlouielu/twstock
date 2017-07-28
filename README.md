@@ -75,7 +75,7 @@ price: 15.95 16.25 16.25  16.6  16.7
 
 分析計算
 
-```
+```python
 from twstock import Stock
 
 stock = Stock('2330')                             # 擷取台積電股價
@@ -87,14 +87,14 @@ ma_br = stock.ma_bias_ratio(5, 10)                # 計算五日、十日乖離�
 
 擷取自 2015 年 1 月至今之資料
 
-```
+```python
 stock = Stock('2330')
 stock.fetch_from(2015, 1)
 ```
 
 基本資料之使用
 
-```
+```python
 >>> stock = Stock('2330')
 >>> stock.price
 [203.5, 203.0, 205.0, 205.0, 205.5, 207.0, 207.0, 203.0, 207.0, 209.0, 209.0, 212.0, 210.5, 211.5, 213.0, 212.0, 207.5, 208.0, 207.0, 208.0, 211.5, 213.0, 216.5, 215.5, 218.0, 217.0, 215.0, 211.5, 208.5, 210.0, 208.5]
@@ -107,7 +107,7 @@ Data(date=datetime.datetime(2017, 5, 18, 0, 0), capacity=22490217, turnover=4559
 
 台股證券編碼
 
-```
+```python
 >>> import twstock
 >>> print(twstock.codes)                # 列印台股全部證券編碼資料
 >>> print(twstock.codes['2330'])        # 列印 2330 證券編碼資料
@@ -120,7 +120,7 @@ StockCodeInfo(type='股票', code='2330', name='台積電', ISIN='TW0002330008',
 
 ## 四大買賣點分析
 
-```
+```python
 from twstock import Stock
 from twstock import BestFourPoint
 
@@ -134,7 +134,7 @@ bfp.best_four_point()           # 綜合判斷
 
 ## 即時股票資訊查詢
 
-```
+```python
 import twstock
 
 twstock.realtime.get('2330')    # 擷取當前台積電股票資訊
