@@ -40,8 +40,8 @@
 
       分析 ``data`` 中之 ``days`` 日之平均數::
 
-          >>> stock.moving_average(5, stock.price)     # 分析 5 日均價
-          >>> stock.moving_average(5, stock.capacity)  # 分析 5 日均量
+          >>> stock.moving_average(stock.price, 5)     # 分析 5 日均價
+          >>> stock.moving_average(stock.capacity, 5)  # 分析 5 日均量
 
    .. method:: ma_bias_ratio(day1, day2)
 

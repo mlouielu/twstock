@@ -36,7 +36,7 @@
       開盤價。
 
    .. attribute:: high
-   
+
       盤中最高價
 
    .. attribute:: low
@@ -46,7 +46,7 @@
    .. attribute:: close
 
       收盤價。
-   
+
    .. attribute:: change
 
       漲跌價差。
@@ -104,7 +104,7 @@
 
       ``data`` 之持續上升天數。
 
-   .. method:: moving_average(self, days: int, data)
+   .. method:: moving_average(self, data: list, days: int)
 
       ``data`` 之 ``days`` 日均數值。
 
