@@ -75,7 +75,7 @@ def get_raw(stocks) -> dict:
 
     try:
         return r.json()
-    except json.decoder.JSONDecodeError:
+    except ValueError:
         return {'rtmessage': 'json decode error', 'rtcode': '5000'}
 
 
