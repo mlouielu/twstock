@@ -71,7 +71,7 @@ class TWSEFetcher(BaseFetcher):
         return DATATUPLE(*data)
 
     def purify(self, original_data):
-        return [self._make_datatuple(d) for d in original_data['data']]
+        return [self._make_datatuple(d) for d in original_data['data'] if d[3] != '--']
 
 
 class TPEXFetcher(BaseFetcher):
@@ -108,7 +108,7 @@ class TPEXFetcher(BaseFetcher):
         return DATATUPLE(*data)
 
     def purify(self, original_data):
-        return [self._make_datatuple(d) for d in original_data['aaData']]
+        return [self._make_datatuple(d) for d in original_data['aaData'] if d[3] != '--']
 
 
 class Stock(analytics.Analytics):
