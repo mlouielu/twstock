@@ -1,0 +1,180 @@
+# -*- coding: utf-8 -*-
+
+from collections import namedtuple
+from datetime import datetime
+
+class StochastiOscillator(object): # 隨機震盪指標
+    """A Stochasti Oscillator(KD) object"""
+
+    def __init__(self, stock, periods=9, smoothing_versus=3, period='day', high=80, low=20, realtime_data=None):
+        """Initialize Stochasti Oscillator
+
+        Args:
+            stock: twstock.Stock.
+            periods: How many units of time.
+            smoothing_versus: Use how many units of time to calculate Simple Moving Average(SMA).
+            period: How long is a unit time.
+            high: Edge of Overbought Zone.
+            low: Edge of Oversold Zone.
+            realtime: Realtime stock infomation.
+        """
+
+        self._stock = stock  # 假如是預設丟31筆資料
+        self._periods = periods  # 取樣範圍 需要periods單位period以上的資料才可以開始算kd值 9 41 198 594 2376
+        self._smoothing_versus = smoothing_versus # 平滑因子 simple moving average of rsv/%k
+        self._period = period # period: day, week, month, season, year
+        self._high = high # 自定義超買區(Overbought Zone)界線
+        self._low = low # 自定義超賣區(Oversold Zone)界線
+        self._realtime_data = realtime_data # 補上當日資料
+        self._realtime = False # 是否使用即時資料
+        self.data = []
+        self.calc()
+
+    def calc(self, start=0):
+        """Calculate Stochasti Oscillator
+
+        Args:
+            start: which row start calculating.
+        """
+
+        def get_period_data():
+            """Transfer daily data to specified period data."""
+
+            self.raw_data = [{'date': None, 'price': None, 'high': None, 'low': None}]
+            index = 0
+            def append_newline(index : int, with_data = True):
+                self.raw_data.append({
+                    'date': (datetime.strptime(self._realtime_data['info']['time'], '%Y-%m-%d %H:%M:%S') if index == len(self._stock.price) else self._stock.date[index]) if with_data else None,
+                    'price': (float(self._realtime_data['realtime']['latest_trade_price']) if index == len(self._stock.price) else self._stock.price[index]) if with_data else None,
+                    'high': (float(self._realtime_data['realtime']['high']) if index == len(self._stock.price) else self._stock.high[index]) if with_data else None,
+                    'low': (float(self._realtime_data['realtime']['low']) if index == len(self._stock.price) else self._stock.low[index]) if with_data else None})
+            def update_lastline(index : int, override = False):
+                self.raw_data[-1]['date'] = (datetime.strptime(self._realtime_data['info']['time'], '%Y-%m-%d %H:%M:%S') if index == len(self._stock.price) else self._stock.date[index])
+                self.raw_data[-1]['price'] = (float(self._realtime_data['realtime']['latest_trade_price']) if index == len(self._stock.price) else self._stock.price[index])
+                self.raw_data[-1]['high'] = (float(self._realtime_data['realtime']['high']) if index == len(self._stock.price) else self._stock.high[index]) if override else max(self._stock.high[index], self.raw_data[-1]['high'])
+                self.raw_data[-1]['low'] = (float(self._realtime_data['realtime']['low']) if index == len(self._stock.price) else self._stock.low[index]) if override else min(self._stock.low[index], self.raw_data[-1]['low'])
+            for index in range(len(self._stock.price) + 1):
+                if index == len(self._stock.price):
+                    if self._realtime_data is None or self._realtime_data['info']['time'][:10] == self.raw_data[-1]['date'].isoformat()[:10]:  # 沒有即時資料或已經有當天資料了
+                        break
+                    else:
+                        self._realtime = True
+                date = datetime.strptime(self._realtime_data['info']['time'], '%Y-%m-%d %H:%M:%S') if index == len(self._stock.price) else self._stock.date[index]
+                if self.raw_data[-1]['date'] is None:
+                    update_lastline(index, True)
+                    continue
+                else:
+                    if self.period == 'day':
+                        append_newline(index)
+                        continue
+                    elif self.period == 'week':
+                        if self.raw_data[-1]['date'].isocalendar()[:2] == date.isocalendar()[:2]: # 同一周
+                            update_lastline(index)
+                            continue
+                    elif self.raw_data[-1]['date'].year == date.year: # 同一年
+                        if self.period == 'month':
+                            if self.raw_data[-1]['date'].month == date.month: # 同一月
+                                update_lastline(index)
+                                continue
+                        elif self.period == 'season':
+                            if (self.raw_data[-1]['date'].month - 1) // 3  == (date.month - 1) // 3: # 同一季
+                                update_lastline(index)
+                                continue
+                        elif self.period == 'year':
+                            update_lastline(index)
+                            continue
+                    append_newline(index)
+        get_period_data()
+        KDJContainer = namedtuple('KDJ', ['date', 'rsv', 'k', 'd', 'j', 'j2', 'price'])
+        self.data = []
+        for index in range(start, len(self.raw_data) - self._periods + 1):
+            low = min([self.raw_data[index2]['low'] for index2 in range(index, index + self._periods)]) # n單位週期的最低最低價
+            high = max([self.raw_data[index2]['high'] for index2 in range(index, index + self._periods)]) # n單位週期的最高最高價
+            # 開始計算 KD 值初始日，無前一日 KD 的數值，可以代入 50
+            raw_stochastic_value = (self.raw_data[index + self._periods - 1]['price'] - low) * 100 / (high - low) # 未成熟隨機值(Raw Stochastic Value)
+            k_value = ((self._smoothing_versus - 1) * (50 if len(self.data) == 0 else self.data[-1].k) + raw_stochastic_value) / self._smoothing_versus # 快速移動平均值: RSV 值的smoothing_versus單位period指數平滑移動平均
+            d_value = ((self._smoothing_versus - 1) * (50 if len(self.data) == 0 else self.data[-1].d) + k_value) / self._smoothing_versus # 慢速移動平均值: K 值的smoothing_versus單位period指數平滑移動平均
+            j_value = 3 * d_value - 2 * k_value # 正乖離程度
+            j2_value = 3 * k_value - 2 * d_value # 負乖離程度
+            self.data.append(KDJContainer(self.raw_data[index + self._periods - 1]['date'], raw_stochastic_value, k_value, d_value, j_value, j2_value, self.raw_data[index + self._periods - 1]['price']))
+
+    def __len__(self):
+        return len(self.data)
+
+    @property
+    def stock(self):
+        return self._stock
+
+    @stock.setter
+    def stock(self, value):
+        self._stock = value
+        self.calc()
+
+    @property
+    def periods(self):
+        return self._periods
+
+    @periods.setter
+    def periods(self, value : int):
+        self._periods = value
+        self.calc()
+
+    @property
+    def smoothing_versus(self):
+        return self._smoothing_versus
+
+    @smoothing_versus.setter
+    def smoothing_versus(self, value : int):
+        self._smoothing_versus = value
+        self.calc()
+
+    @property
+    def period(self):
+        return self._period
+
+    @period.setter
+    def period(self, value : str):
+        self._period = value
+        self.calc()
+
+    @property
+    def realtime_data(self):
+        return self._realtime_data
+
+    @realtime_data.setter
+    def realtime_data(self, value : dict):
+        self._realtime_data = value
+        self._realtime = False
+        self.calc()
+
+    @property
+    def realtime(self):
+        return self._realtime
+
+    @property
+    def date(self):
+        return [d.date for d in self.data]
+
+    @property
+    def rsv(self):
+        return [d.rsv for d in self.data]
+
+    @property
+    def k(self):
+        return [d.k for d in self.data]
+
+    @property
+    def d(self):
+        return [d.d for d in self.data]
+
+    @property
+    def j(self):
+        return [d.j for d in self.data]
+
+    @property
+    def j2(self):
+        return [d.j2 for d in self.data]
+
+    @property
+    def price(self):
+        return [d.price for d in self.data]
