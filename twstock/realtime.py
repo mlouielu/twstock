@@ -5,7 +5,6 @@ import json
 import time
 import requests
 import twstock
-import sys
 
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
@@ -74,10 +73,9 @@ def get_raw(stocks) -> dict:
             stock_id=_join_stock_id(stocks),
             time=int(time.time()) * 1000))
 
-    json_decode_error = ValueError if sys.version_info < (3, 5) else JSONDecodeError
     try:
         return r.json()
-    except json_decode_error:
+    except json.decoder.JSONDecodeError:
         return {'rtmessage': 'json decode error', 'rtcode': '5000'}
 
 
