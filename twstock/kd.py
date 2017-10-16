@@ -98,6 +98,75 @@ class StochastiOscillator(object): # 隨機震盪指標
             j2_value = 3 * k_value - 2 * d_value # 負乖離程度
             self.data.append(KDJContainer(self.raw_data[index + self._periods - 1]['date'], raw_stochastic_value, k_value, d_value, j_value, j2_value, self.raw_data[index + self._periods - 1]['price']))
 
+    def kd_high_passivation(self):
+        """高檔鈍化 K值在高檔(K值>80)連續3天 未來再漲的機率高
+
+        Returns:
+            Does high passivation happen?
+        """
+
+        if len(self.data) < 3:
+            return None
+        return self.data[-1].k >= self._high and self.data[-2].k >= self._high and self.data[-3].k >= self._high
+
+    def kd_low_passivation(self):
+        """低檔鈍化 K值在低檔(K值<20)區連續3天 未來繼續跌的機率高"""
+        if len(self.data) < 3:
+            return None
+        return self.data[-1].k <= self._low and self.data[-2].k <= self._low and self.data[-3].k <= self._low
+
+    def k_high(self):
+        """K高檔(建議賣出)"""
+        if len(self.data) == 0:
+            return None
+        return self.data[-1].k >= self._high
+
+    def k_low(self):
+        """K低檔(建議買進)"""
+        if len(self.data) == 0:
+            return None
+        return self.data[-1].k <= self._low
+
+    def golden_intersection(self):
+        """黃金交叉(建議買進)"""
+        if len(self.data) < 2:
+            return None
+        return self.data[-1].d <= 30 and self.data[-1].k >= self.data[-1].d and self.data[-2].k < self.data[-2].d
+
+    def dead_intersection(self):
+        """死亡交叉(建議賣出)"""
+        if len(self.data) < 2:
+            return None
+        return self.data[-1].d >= 70 and self.data[-1].k <= self.data[-1].d and self.data[-2].k > self.data[-2].d
+
+    # 低檔鈍化後反彈
+
+    # 高檔鈍化後反彈
+
+    def top_divergence(self):
+        """頂背離(建議賣出) 股價創新高，KD沒有創新高 或 股價沒有創新高，KD創新高"""
+        if len(self.data) < 2:
+            return None
+        return (self.data[-1].price > self.data[-2].price and self.data[-1].k <= self.data[-2].k and self.data[-1].d <= self.data[-2].d) or (self.data[-1].k > self.data[-2].k and self.data[-1].d > self.data[-2].d and self.data[-1].price <= self.data[-2].price)
+
+    def button_divergence(self):
+        """底背離(建議買進) 股價創新低，KD沒有創新低 或 股價沒有創新低，KD創新低"""
+        if len(self.data) < 2:
+            return None
+        return (self.data[-1].price < self.data[-2].price and self.data[-1].k >= self.data[-2].k and self.data[-1].d >= self.data[-2].d) or (self.data[-1].k < self.data[-2].k and self.data[-1].d < self.data[-2].d and self.data[-1].price >= self.data[-2].price)
+
+    # 多頭高生命力股
+    #   季線：向上+金叉
+    #   月線：向上+金叉+高檔鈍化+高檔鈍化後反彈
+    #   週線：向上+金叉+高檔鈍化+突破高布林+高檔鈍化後反彈
+    #   日線：向上+金叉+高檔鈍化+突破高布林+高檔鈍化後反彈
+
+    # 空頭高生命力股
+    #   季線：向下+死叉
+    #   月線：向下+死叉+低檔鈍化+低檔鈍化後反彈
+    #   週線：向下+死叉+低檔鈍化+跌破低布林+低檔鈍化後反彈
+    #   日線：向下+死叉+低檔鈍化+跌破低布林+低檔鈍化後反彈
+
     def __len__(self):
         return len(self.data)
 
