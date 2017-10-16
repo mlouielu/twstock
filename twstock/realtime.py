@@ -5,7 +5,6 @@ import json
 import time
 import requests
 import twstock
-import sys
 
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
