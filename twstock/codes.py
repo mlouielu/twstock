@@ -29,11 +29,12 @@ def read_csv(path, types):
         csvfile.readline()
         for row in reader:
             row = ROW(*row)
-            codes[row.code] = row
+            code = row.code.strip()
+            codes[code] = row
             if types == 'tpex':
-                tpex[row.code] = row
+                tpex[code] = row
             else:
-                twse[row.code] = row
+                twse[code] = row
 
 
 read_csv(TPEX_EQUITIES_CSV_PATH, 'tpex')
