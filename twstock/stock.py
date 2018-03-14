@@ -68,17 +68,17 @@ class TWSEFetcher(BaseFetcher):
         data[0] = datetime.datetime.strptime(self._convert_date(data[0]), '%Y/%m/%d')
         data[1] = int(data[1].replace(',', ''))
         data[2] = int(data[2].replace(',', ''))
-        data[3] = float(data[3].replace(',', ''))
-        data[4] = float(data[4].replace(',', ''))
-        data[5] = float(data[5].replace(',', ''))
-        data[6] = float(data[6].replace(',', ''))
+        data[3] = None if data[3] == '--' else float(data[3].replace(',', ''))
+        data[4] = None if data[4] == '--' else float(data[4].replace(',', ''))
+        data[5] = None if data[5] == '--' else float(data[5].replace(',', ''))
+        data[6] = None if data[6] == '--' else float(data[6].replace(',', ''))
         # +/-/X表示漲/跌/不比價
         data[7] = float(0.0 if data[7].replace(',', '') == 'X0.00' else data[7].replace(',', ''))
         data[8] = int(data[8].replace(',', ''))
         return DATATUPLE(*data)
 
     def purify(self, original_data):
-        return [self._make_datatuple(d) for d in original_data['data'] if d[3] != '--']
+        return [self._make_datatuple(d) for d in original_data['data']]
 
 
 class TPEXFetcher(BaseFetcher):
@@ -114,10 +114,10 @@ class TPEXFetcher(BaseFetcher):
         data[0] = datetime.datetime.strptime(self._convert_date(data[0]), '%Y/%m/%d')
         data[1] = int(data[1].replace(',', '')) * 1000
         data[2] = int(data[2].replace(',', '')) * 1000
-        data[3] = float(data[3].replace(',', ''))
-        data[4] = float(data[4].replace(',', ''))
-        data[5] = float(data[5].replace(',', ''))
-        data[6] = float(data[6].replace(',', ''))
+        data[3] = None if data[3] == '--' else float(data[3].replace(',', ''))
+        data[4] = None if data[4] == '--' else float(data[4].replace(',', ''))
+        data[5] = None if data[5] == '--' else float(data[5].replace(',', ''))
+        data[6] = None if data[6] == '--' else float(data[6].replace(',', ''))
         data[7] = float(data[7].replace(',', ''))
         data[8] = int(data[8].replace(',', ''))
         return DATATUPLE(*data)
