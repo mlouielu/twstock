@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import json
 import urllib.parse
 from collections import namedtuple
-import sys
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
 
 import requests
 
@@ -43,23 +45,18 @@ class TWSEFetcher(BaseFetcher):
     def __init__(self):
         pass
 
-    def fetch(self, year: int, month: int, sid: str, retry=5):
+    def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
-        r = requests.get(self.REPORT_URL, params=params)
-        if sys.version_info < (3, 5):
+        for retry_i in range(retry):
+            r = requests.get(self.REPORT_URL, params=params)
             try:
                 data = r.json()
-            except ValueError:
-                if retry:
-                    return self.fetch(year, month, sid, retry - 1)
-                data = {'stat': '', 'data': []}
+            except JSONDecodeError:
+                continue
+            else:
+                break
         else:
-            try:
-                data = r.json()
-            except json.decoder.JSONDecodeError:
-                if retry:
-                    return self.fetch(year, month, sid, retry - 1)
-                data = {'stat': '', 'data': []}
+            data = {'stat': '', 'data': []}
 
         if data['stat'] == 'OK':
             data['data'] = self.purify(data)
@@ -75,7 +72,8 @@ class TWSEFetcher(BaseFetcher):
         data[4] = float(data[4].replace(',', ''))
         data[5] = float(data[5].replace(',', ''))
         data[6] = float(data[6].replace(',', ''))
-        data[7] = float(0.0 if data[7].replace(',', '') == 'X0.00' else data[7].replace(',', ''))  # +/-/X表示漲/跌/不比價
+        # +/-/X表示漲/跌/不比價
+        data[7] = float(0.0 if data[7].replace(',', '') == 'X0.00' else data[7].replace(',', ''))
         data[8] = int(data[8].replace(',', ''))
         return DATATUPLE(*data)
 
@@ -90,10 +88,18 @@ class TPEXFetcher(BaseFetcher):
     def __init__(self):
         pass
 
-    def fetch(self, year: int, month: int, sid: str):
+    def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
-        r = requests.get(self.REPORT_URL, params=params)
-        data = r.json()
+        for retry_i in range(retry):
+            r = requests.get(self.REPORT_URL, params=params)
+            try:
+                data = r.json()
+            except JSONDecodeError:
+                continue
+            else:
+                break
+        else:
+            data = {'aaData': []}
 
         data['data'] = []
         if data['aaData']:
