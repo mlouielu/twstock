@@ -23,6 +23,20 @@ class FetcherTest(object):
         self.assertEqual(dt.change, 2.0)
         self.assertEqual(dt.transaction, 15718)
 
+    def test_make_datatuple_without_prices(self):
+        data = ['106/05/02', '45,851,963', '9,053,856,108', '--',
+                '--', '--', '--', ' 0.00', '15,718']
+        dt = self.fetcher._make_datatuple(data)
+        self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
+        self.assertEqual(dt.capacity, 45851963)
+        self.assertEqual(dt.turnover, 9053856108)
+        self.assertEqual(dt.open, None)
+        self.assertEqual(dt.high, None)
+        self.assertEqual(dt.low, None)
+        self.assertEqual(dt.close, None)
+        self.assertEqual(dt.change, 0.0)
+        self.assertEqual(dt.transaction, 15718)
+
 
 class TWSEFetcerTest(unittest.TestCase, FetcherTest):
     fetcher = stock.TWSEFetcher()
@@ -33,7 +47,7 @@ class TPEXFetcherTest(unittest.TestCase, FetcherTest):
 
     def test_make_datatuple(self):
         data = ['106/05/02', '45,851', '9,053,856', '198.50',
-                '199.00', '195.50', '196.50', '+2.00', '15,718']
+                '199.00', '195.50', '196.50', '2.00', '15,718']
         dt = self.fetcher._make_datatuple(data)
         self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
         self.assertEqual(dt.capacity, 45851000)
@@ -43,6 +57,20 @@ class TPEXFetcherTest(unittest.TestCase, FetcherTest):
         self.assertEqual(dt.low, 195.5)
         self.assertEqual(dt.close, 196.5)
         self.assertEqual(dt.change, 2.0)
+        self.assertEqual(dt.transaction, 15718)
+
+    def test_make_datatuple_without_prices(self):
+        data = ['106/05/02', '45,851', '9,053,856', '--',
+                '--', '--', '--', '0.00', '15,718']
+        dt = self.fetcher._make_datatuple(data)
+        self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
+        self.assertEqual(dt.capacity, 45851000)
+        self.assertEqual(dt.turnover, 9053856000)
+        self.assertEqual(dt.open, None)
+        self.assertEqual(dt.high, None)
+        self.assertEqual(dt.low, None)
+        self.assertEqual(dt.close, None)
+        self.assertEqual(dt.change, 0.0)
         self.assertEqual(dt.transaction, 15718)
 
 
