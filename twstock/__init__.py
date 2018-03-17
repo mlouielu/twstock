@@ -11,4 +11,4 @@ from twstock.codes import twse, tpex, codes
 from twstock.stock import Stock
 
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
