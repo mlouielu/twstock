@@ -113,7 +113,8 @@ class TPEXFetcher(BaseFetcher):
         return '/'.join([str(int(date.split('/')[0]) + 1911)] + date.split('/')[1:])
 
     def _make_datatuple(self, data):
-        data[0] = datetime.datetime.strptime(self._convert_date(data[0]), '%Y/%m/%d')
+        data[0] = datetime.datetime.strptime(self._convert_date(data[0].replace('＊', '')),
+                                             '%Y/%m/%d')
         data[1] = int(data[1].replace(',', '')) * 1000
         data[2] = int(data[2].replace(',', '')) * 1000
         data[3] = None if data[3] == '--' else float(data[3].replace(',', ''))

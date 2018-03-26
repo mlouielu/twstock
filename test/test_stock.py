@@ -73,6 +73,20 @@ class TPEXFetcherTest(unittest.TestCase, FetcherTest):
         self.assertEqual(dt.change, 0.0)
         self.assertEqual(dt.transaction, 15718)
 
+    def test_make_datatuple_with_asterisk(self):
+        data = ['106/05/02＊', '45,851', '9,053,856', '198.50',
+                '199.00', '195.50', '196.50', '2.00', '15,718']
+        dt = self.fetcher._make_datatuple(data)
+        self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
+        self.assertEqual(dt.capacity, 45851000)
+        self.assertEqual(dt.turnover, 9053856000)
+        self.assertEqual(dt.open, 198.5)
+        self.assertEqual(dt.high, 199.0)
+        self.assertEqual(dt.low, 195.5)
+        self.assertEqual(dt.close, 196.5)
+        self.assertEqual(dt.change, 2.0)
+        self.assertEqual(dt.transaction, 15718)
+
 
 class StockTest(object):
     def test_fetch_31(self):
