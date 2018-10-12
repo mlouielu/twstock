@@ -7,8 +7,8 @@ from twstock import mock
 from twstock import realtime
 
 from twstock.analytics import BestFourPoint
-from twstock.codes import twse, tpex, codes
+from twstock.codes import __update_codes, twse, tpex, codes
 from twstock.stock import Stock
 
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'

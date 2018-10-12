@@ -6,6 +6,7 @@
 # TPEx equities = 上櫃證券
 #
 
+import os
 import csv
 from collections import namedtuple
 
@@ -50,6 +51,13 @@ def to_csv(url, path):
         writer.writerow(data[0]._fields)
         for d in data:
             writer.writerow([_ for _ in d])
+
+
+def __update_codes():
+    def get_directory():
+        return os.path.dirname(os.path.abspath(__file__))
+    to_csv(TWSE_EQUITIES_URL, os.path.join(get_directory(), 'twse_equities.csv'))
+    to_csv(TPEX_EQUITIES_URL, os.path.join(get_directory(), 'tpex_equities.csv'))
 
 
 if __name__ == '__main__':
