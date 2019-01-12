@@ -73,6 +73,18 @@ low  :  15.8  16.1 15.15  16.3 16.25
 price: 15.95 16.25 16.25  16.6  16.7
 ```
 
+```
+$ python -m twstock -s 2002 2412 -p http://118.150.167.16:3128
+-------------- 2002 ----------------
+high : 24.15 23.95 23.95 24.05 24.25
+low  :  24.0  23.7 23.75 23.85 23.85
+price: 24.15  23.8  23.8 23.95 24.25
+-------------- 2412 ----------------
+high : 108.0 107.5 107.0 107.0 113.0
+low  : 106.5 106.0 106.0 106.0 106.5
+price: 107.0 106.5 106.0 106.5 113.0
+```
+
 ## Update Codes
 
 當你第一次使用 twstock 時，你可以更新 TPEX 跟 TWSE 的列表，可以使用兩種方式更新：
@@ -139,6 +151,17 @@ StockCodeInfo(type='股票', code='2330', name='台積電', ISIN='TW0002330008',
 '1994/09/05'
 ```
 
+
+使用 Proxy 抓取資料
+
+```python
+proxies_list = [
+    'http://127.0.0.1:3128',
+    'http://118.150.167.16:3128',
+]
+stock = Stock('2330', proxies_list=proxies_list) # 擷取台積電股價
+```
+
 ## 四大買賣點分析
 
 ```python
@@ -163,9 +186,33 @@ twstock.realtime.get(['2330', '2337', '2409'])  # 擷取當前三檔資訊
 ```
 
 
+```python
+import twstock
+
+twstock.realtime.proxies_list = [
+    'http://127.0.0.1:3128',
+    'http://118.150.167.16:3128',
+    'http://59.127.168.43:3128',
+    'http://220.130.172.122:8080',
+] # 使用Proxy清單
+t = twstock.realtime.get('2330') # 擷取當前台積電股票資訊
+```
+
 ## 使用範例
 
 * [tw-stocker](https://github.com/mlouielu/stocker)
+
+## 開發
+
+### 單元測試及覆蓋率
+
+```bash
+# 執行單元測試，並產生覆蓋率資料
+coverage run --source=twstock -m unittest
+
+# 產生覆蓋率網頁(./htmlcov/index.html)，方便閱讀
+coverage html
+```
 
 ## Contributing
 

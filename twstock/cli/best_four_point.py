@@ -9,11 +9,11 @@ stdout = io.TextIOWrapper(
     getattr(sys.stdout, 'buffer', sys.stdout), encoding='utf-8', errors='replace')
 
 
-def run(argv):
+def run(argv, proxies_list: list=[]):
     print('四大買賣點判斷 Best Four Point', file=stdout)
     print('------------------------------', file=stdout)
     for sid in argv:
-        bfp = twstock.BestFourPoint(twstock.Stock(sid))
+        bfp = twstock.BestFourPoint(twstock.Stock(sid, proxies_list=proxies_list))
         bfp = bfp.best_four_point()
         print('%s: ' % (sid), end='', file=stdout)
         if bfp:

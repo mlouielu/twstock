@@ -3,5 +3,5 @@
 import twstock
 
 
-def run(argv):
+def run(argv, proxies_list: list=[]):
     pass

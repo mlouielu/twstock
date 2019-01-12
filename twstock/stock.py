@@ -7,6 +7,7 @@ try:
     from json.decoder import JSONDecodeError
 except ImportError:
     JSONDecodeError = ValueError
+from requests.exceptions import ProxyError
 
 import requests
 
@@ -25,8 +26,22 @@ DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
 
 
 class BaseFetcher(object):
+    PROXIES_LIST = [] # 預設不使用 Proxy
+
     def fetch(self, year, month, sid, retry):
         pass
+
+    def _get_proxies(self):
+        if len(self.PROXIES_LIST) == 0:
+            return [] # 假如沒有設定Proxy，就不使用
+        if 'proxy_counter' not in self.__dict__:
+            self.proxy_counter = -1
+        self.proxy_counter += 1
+        self.proxy_counter %= len(self.PROXIES_LIST)
+        return {
+            'http': self.PROXIES_LIST[self.proxy_counter],
+            'https': self.PROXIES_LIST[self.proxy_counter],
+        }
 
     def _convert_date(self, date):
         """Convert '106/05/01' to '2017/05/01'"""
@@ -48,10 +63,17 @@ class TWSEFetcher(BaseFetcher):
     def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
         for retry_i in range(retry):
-            r = requests.get(self.REPORT_URL, params=params)
             try:
-                data = r.json()
-            except JSONDecodeError:
+                r = requests.get(self.REPORT_URL, params=params, proxies=self._get_proxies())
+                try:
+                    data = r.json()
+                except JSONDecodeError:
+                    continue
+                else:
+                    break
+            except TimeoutError:
+                continue
+            except ProxyError:
                 continue
             else:
                 break
@@ -92,10 +114,18 @@ class TPEXFetcher(BaseFetcher):
     def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
         for retry_i in range(retry):
-            r = requests.get(self.REPORT_URL, params=params)
             try:
-                data = r.json()
-            except JSONDecodeError:
+                r = requests.get(self.REPORT_URL, params=params, proxies=self._get_proxies())
+                try:
+                    data = r.json()
+                    # print(r.text)
+                except JSONDecodeError:
+                    continue
+                else:
+                    break
+            except TimeoutError:
+                continue
+            except ProxyError:
                 continue
             else:
                 break
@@ -131,11 +161,12 @@ class TPEXFetcher(BaseFetcher):
 
 class Stock(analytics.Analytics):
 
-    def __init__(self, sid: str, initial_fetch: bool=True):
+    def __init__(self, sid: str, initial_fetch: bool=True, proxies_list: list=[]):
         self.sid = sid
         self.fetcher = TWSEFetcher() if codes[sid].market == '上市' else TPEXFetcher()
         self.raw_data = []
         self.data = []
+        self.fetcher.PROXIES_LIST = proxies_list
 
         # Init data
         if initial_fetch:

@@ -5,15 +5,33 @@ import json
 import time
 import requests
 import twstock
-import sys
-
+# import sys
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
+from requests.exceptions import ProxyError
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
 STOCKINFO_URL = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
 
+proxies_list = [] # 預設不使用 Proxy
+
 # Mock data
 mock = False
 
+def _get_proxies():
+    global proxies_list
+    if len(proxies_list) == 0:
+        return [] # 假如沒有設定Proxy，就不使用
+    if 'counter' not in _get_proxies.__dict__:
+        _get_proxies.counter = -1
+    _get_proxies.counter += 1
+    _get_proxies.counter %= len(proxies_list)
+    return {
+        'http': proxies_list[_get_proxies.counter],
+        'https': proxies_list[_get_proxies.counter],
+    }
 
 def _format_stock_info(data) -> dict:
     result = {
@@ -67,23 +85,24 @@ def _join_stock_id(stocks) -> str:
 
 def get_raw(stocks) -> dict:
     req = requests.Session()
-    req.get(SESSION_URL)
+    try:
+        proxies = _get_proxies()
+        req.get(SESSION_URL, proxies=proxies)
 
-    r = req.get(
-        STOCKINFO_URL.format(
-            stock_id=_join_stock_id(stocks),
-            time=int(time.time()) * 1000))
+        r = req.get(
+            STOCKINFO_URL.format(
+                stock_id=_join_stock_id(stocks),
+                time=int(time.time()) * 1000), proxies=proxies)
+    except ProxyError:
+        return {'rtmessage': 'proxy error', 'rtcode': '5003'}
+    except TimeoutError:
+        return {'rtmessage': 'timeout error', 'rtcode': '5002'}
 
-    if sys.version_info < (3, 5):
-        try:
-            return r.json()
-        except ValueError:
-            return {'rtmessage': 'json decode error', 'rtcode': '5000'}
-    else:
-        try:
-            return r.json()
-        except json.decoder.JSONDecodeError:
-            return {'rtmessage': 'json decode error', 'rtcode': '5000'}
+    try:
+        # print(r.text)
+        return r.json()
+    except JSONDecodeError:
+        return {'rtmessage': 'json decode error', 'rtcode': '5000'}
 
 
 def get(stocks, retry=3):
@@ -93,8 +112,14 @@ def get(stocks, retry=3):
     # Set success
     data['success'] = False
 
+    if 'rtcode' not in data:
+        data['rtmessage'] = 'No Status.'
+        data['rtcode'] = '5004'
+        return data
+
+    # Proxy error, could be proxy server down, retry another proxy
     # JSONdecode error, could be too fast, retry
-    if data['rtcode'] == '5000':
+    if data['rtcode'] in ['5000', '5002', '5003']:
         # XXX: Stupit retry, you will dead here
         if retry:
             return get(stocks, retry - 1)
