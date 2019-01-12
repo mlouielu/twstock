@@ -13,16 +13,16 @@ branches:
   only:
     - master
 
+init:
+  - echo %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
+
 install:
   - 'set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%'
   - 'python -m pip install -U pip'
-  - 'python -m pip install -r requirements.txt'
-  - 'python -m pip install wheel'
-  - 'python -m pip install flit'
+  - 'python -m pip install pipenv'
 
 build_script:
-  - 'python -m flit build'
-  - 'python -m flit install'
+  - 'python -m pipenv install --dev'
 
 test_script:
-  - 'python -m unittest'
+  - 'python -m pipenv run coverage run --source=twstock -m unittest'
