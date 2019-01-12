@@ -16,16 +16,12 @@ python:
   - "nightly"
 
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-  - pip install codecov
-  - pip install flit
-  - flit build
-  - flit install
+  - pip install pipenv
+  - pipenv install --dev
 
 script:
-  - coverage run --source=twstock -m unittest
+  - pipenv run coverage run --source=twstock -m unittest
 
 after_success:
-  - coveralls
-  - codecov
+  - pipenv run coveralls
+  - pipenv run codecov
