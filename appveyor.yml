@@ -2,25 +2,27 @@ environment:
   global:
     FLIT_ROOT: C:\projects\flit
   matrix:
-    - PYTHON: "C:\\Python34"
-    - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python36"
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: "3.6.2"
-      PYTHON_ARCH: "64"
+    - PYTHON: 'C:\Python34'
+    - PYTHON: 'C:\Python35'
+    - PYTHON: 'C:\Python36'
+    - PYTHON: 'C:\Python36-x64'
+      PYTHON_VERSION: '3.6.2'
+      PYTHON_ARCH: '64'
 
 branches:
   only:
     - master
 
 install:
-  - "%PYTHON%\\python.exe -m pip install wheel"
-  - "%PYTHON%\\python.exe -m pip install flit"
+  - 'set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%'
+  - 'python -m pip install -U pip'
+  - 'python -m pip install -r requirements.txt'
+  - 'python -m pip install wheel'
+  - 'python -m pip install flit'
 
 build_script:
-  - "%PYTHON%\\python.exe -m flit build"
-  - "%PYTHON%\\python.exe -m flit install"
+  - 'python -m flit build'
+  - 'python -m flit install'
 
 test_script:
-  - "%PYTHON%\\python.exe -m unittest"
-
+  - 'python -m unittest'
