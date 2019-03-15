@@ -246,9 +246,9 @@
 
 查詢代號是否為上櫃股票::
 
-   >>> '2330' in twstock.twse
+   >>> '2330' in twstock.tpex
    False
-   >>> '6223' in twstock.twse
+   >>> '6223' in twstock.tpex
    True
 
 查詢代號是否為台灣股票代號::
