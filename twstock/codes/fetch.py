@@ -45,7 +45,7 @@ def fetch_data(url):
 
 def to_csv(url, path):
     data = fetch_data(url)
-    with open(path, 'w', newline='') as csvfile:
+    with open(path, 'w', newline='', encoding='utf_8') as csvfile:
         writer = csv.writer(csvfile,
                             delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(data[0]._fields)
