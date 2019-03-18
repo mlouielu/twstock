@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-65;5403;1c
 import argparse
 from twstock.codes import __update_codes
 from twstock.cli import best_four_point
