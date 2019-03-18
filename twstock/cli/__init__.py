@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+65;5403;1c
 import argparse
 from twstock.codes import __update_codes
 from twstock.cli import best_four_point
@@ -26,3 +26,5 @@ def run():
         print('Start to update codes')
         __update_codes()
         print('Done!')
+    else:
+        parser.print_help()
