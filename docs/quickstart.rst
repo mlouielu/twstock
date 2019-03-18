@@ -6,6 +6,22 @@
 
 下面將透過 Python REPL 來學習如何使用 ``twstock``。
 
+更新 TPEX / TWSE Codes
+======================
+
+如果你是第一次使用 twstock，你可能會需要更新 TPEX/TWSE Codes。
+
+你可以透過下面兩種方式更新:
+
+以 CLI 更新::
+
+  $ twstock -U
+
+以 Python 更新::
+
+  >>> import twstock
+  >>> twstock.__update_codes()
+
 
 認識 Stock
 ===========

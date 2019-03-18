@@ -71,6 +71,25 @@ low  :  15.8  16.1 15.15  16.3 16.25
 price: 15.95 16.25 16.25  16.6  16.7
 ```
 
+## Update Codes
+
+當你第一次使用 twstock 時，你可以更新 TPEX 跟 TWSE 的列表，可以使用兩種方式更新：
+
+* By CLI
+
+```
+$ twstock -U
+Start to update codes
+Done!
+```
+
+* By Python
+
+```
+>>> import twstock
+>>> twstock.__update_codes()
+```
+
 ## Quick Start
 
 分析計算
