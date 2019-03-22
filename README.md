@@ -19,6 +19,8 @@ twstock 台灣股市股票價格擷取
 * [證券交易所 (TWSE)](http://www.twse.com.tw)
 * [證券櫃台買賣中心 (TPEX)](http://www.tpex.org.tw)
 
+(請注意，TWSE 有 request limit, 每 5 秒鐘 3 個 request，超過的話會被 ban 掉，請自行注意)
+
 ## Documentation
 
 * [twstock documentation (正體中文)](http://twstock.readthedocs.io/zh_TW/latest)
