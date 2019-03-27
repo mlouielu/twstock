@@ -13,7 +13,10 @@ class Analytics(object):
                 break
         return cont * diff[0]
 
-    def moving_average(self, data, days):
+    def moving_average(self, data, days, skipna=True):
+        if skipna:
+            data = [x for x in data if x is not None]
+
         result = []
         data = data[:]
         for _ in range(len(data) - days + 1):
