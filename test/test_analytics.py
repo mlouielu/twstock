@@ -151,4 +151,3 @@ class BestFourPointTest(unittest.TestCase):
         self.assertEqual(self.ng.best_four_point(),
                          self.legacy.best_four_point())
 
-print(AnalyticsTest.test_moving_average)
