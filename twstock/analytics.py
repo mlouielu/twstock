@@ -16,9 +16,10 @@ class Analytics(object):
     def moving_average(self, data, days, skipna=True):
         if skipna:
             data = [x for x in data if x is not None]
-
+        else:
+            data = data[:]
+        
         result = []
-        data = data[:]
         for _ in range(len(data) - days + 1):
             result.append(round(sum(data[-days:]) / days, 2))
             data.pop()
