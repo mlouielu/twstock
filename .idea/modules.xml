@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/japtwstock.iml" filepath="$PROJECT_DIR$/.idea/japtwstock.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/twstock.iml" filepath="$PROJECT_DIR$/.idea/twstock.iml" />
+>>>>>>> origin/frank_master
     </modules>
   </component>
 </project>
