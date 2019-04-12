@@ -52,7 +52,7 @@ class AnalyticsTest(unittest.TestCase):
         data = [10, 11, 12, 15, 10, 12, None, 10, 5]
 
         # Legacy moving_average will affect data argument's data
-        ng_result = self.ng.moving_average(data, 2)
+        ng_result = self.ng.moving_average(data, 2, skipna=True)
         self.assertEqual(ng_result, [10.5, 11.5, 13.5, 12.5, 11.0, 11.0, 7.5])
 
     def test_ma_bias_ratio(self):
