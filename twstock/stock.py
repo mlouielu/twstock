@@ -3,6 +3,9 @@
 import datetime
 import urllib.parse
 from collections import namedtuple
+
+from twstock.proxy import get_proxies
+
 try:
     from json.decoder import JSONDecodeError
 except ImportError:
@@ -48,7 +51,7 @@ class TWSEFetcher(BaseFetcher):
     def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
         for retry_i in range(retry):
-            r = requests.get(self.REPORT_URL, params=params)
+            r = requests.get(self.REPORT_URL, params=params, proxies=get_proxies())
             try:
                 data = r.json()
             except JSONDecodeError:
@@ -92,7 +95,7 @@ class TPEXFetcher(BaseFetcher):
     def fetch(self, year: int, month: int, sid: str, retry: int=5):
         params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
         for retry_i in range(retry):
-            r = requests.get(self.REPORT_URL, params=params)
+            r = requests.get(self.REPORT_URL, params=params, proxies=get_proxies())
             try:
                 data = r.json()
             except JSONDecodeError:

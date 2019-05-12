@@ -13,6 +13,7 @@ from collections import namedtuple
 import requests
 from lxml import etree
 
+from twstock.proxy import get_proxies
 
 TWSE_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=2'
 TPEX_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=4'
@@ -26,7 +27,7 @@ def make_row_tuple(typ, row):
 
 
 def fetch_data(url):
-    r = requests.get(url)
+    r = requests.get(url, proxies=get_proxies())
     root = etree.HTML(r.text)
     trs = root.xpath('//tr')[1:]
 
