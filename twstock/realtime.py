@@ -7,6 +7,7 @@ import requests
 import twstock
 import sys
 
+from twstock.proxy import get_proxies
 
 SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
 STOCKINFO_URL = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
@@ -67,7 +68,7 @@ def _join_stock_id(stocks) -> str:
 
 def get_raw(stocks) -> dict:
     req = requests.Session()
-    req.get(SESSION_URL)
+    req.get(SESSION_URL, proxies=get_proxies())
 
     r = req.get(
         STOCKINFO_URL.format(
