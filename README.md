@@ -32,22 +32,26 @@ twstock 台灣股市股票價格擷取
 
 ## Install
 
-from pip (recommand):
+By PyPi
 
 ```
-$ pip install --user twstock
-
-or
-
-$ sudo pip install twstock
+$ python -m pip install --user twstock
 ```
 
-from GitHub:
+By Source
 
 ```
 $ git clone https://github.com/mlouielu/twstock
 $ cd twstock
-$ pip install flit  # If you didn't install flit before
+$ pipenv install
+```
+
+By Source & install
+
+```
+$ git clone https://github.com/mlouielu/twstock
+$ cd twstock
+$ python -m pip install --user flit
 $ flit install
 ```
 
