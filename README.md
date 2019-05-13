@@ -141,7 +141,7 @@ StockCodeInfo(type='股票', code='2330', name='台積電', ISIN='TW0002330008',
 
 使用 Proxy (基於 [requests proxies](https://2.python-requests.org/en/master/user/advanced/#proxies))
 
-```
+```python
 # 單一 Proxy
 >>> from twstock.proxy import SingleProxyProvider
 >>> spr = SingleProxyProvider({'http': 'http://localhost:8080'})
