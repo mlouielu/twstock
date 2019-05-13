@@ -2,6 +2,7 @@ import unittest
 
 from twstock.proxy import get_proxies, configure_proxy_provider, reset_proxy_provider
 from twstock.proxy import SingleProxyProvider
+from twstock.proxy import RoundRobinProxiesProvider
 
 
 class ProxyProviderTest(unittest.TestCase):
@@ -24,3 +25,18 @@ class ProxyProviderTest(unittest.TestCase):
         # reset proxy
         reset_proxy_provider()
         self.assertDictEqual({}, get_proxies())
+
+
+    def test_rr_proxies_provider(self):
+        proxies = ['a', 'b', 'c']
+        rr_provider = RoundRobinProxiesProvider(proxies)
+
+        for _ in range(3):
+            for p in proxies:
+                self.assertEqual(rr_provider.get_proxy(), p)
+
+        proxies = ['d', 'e', 'f']
+        rr_provider.proxies = proxies
+        for _ in range(3):
+            for p in proxies:
+                self.assertEqual(rr_provider.get_proxy(), p)
