@@ -139,6 +139,26 @@ StockCodeInfo(type='股票', code='2330', name='台積電', ISIN='TW0002330008',
 '1994/09/05'
 ```
 
+使用 Proxy (基於 [requests proxies](https://2.python-requests.org/en/master/user/advanced/#proxies))
+
+```
+# 單一 Proxy
+>>> from twstock.proxy import SingleProxyProvider
+>>> spr = SingleProxyProvider({'http': 'http://localhost:8080'})
+>>> twstock.proxy.configure_proxy_provider(spr)
+
+# 多個 Proxy
+>>> from twstock.proxy import RoundRobinProxiesProvider
+>>> proxies = [{'http': 'http://localhost:5000'}, {'http': 'http://localhost:5001'}]
+>>> rrpr = RoundRobinProxiesProvider(proxies)
+>>> twstock.proxy.configure_proxy_provider(rrpr)
+
+# 變更 Proxy 表
+>>> another_proxies = [{'http': 'http://localhost:8000'}, {'https': 'https://localhost:8001'}]
+>>> rrpr.proxies = another_proxies
+```
+
+
 ## 四大買賣點分析
 
 ```python
