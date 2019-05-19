@@ -186,6 +186,17 @@ twstock.realtime.get('2330')    # 擷取當前台積電股票資訊
 twstock.realtime.get(['2330', '2337', '2409'])  # 擷取當前三檔資訊
 ```
 
+## 節省 http request
+
+Stock 物件在初始化時，預設的行為會抓取近 31 個交易日的資料。實作上會由今日往前算 60 天，因此每建立一個 Stock 物件，會打 3 個 http request。若想避免這個行為，可設定初始參數：
+
+```py
+import twstock
+
+# 不執行預抓交易資料
+twstock.Stock('1240', initial_fetch=False)
+```
+
 
 ## 使用範例
 
