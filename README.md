@@ -29,6 +29,7 @@ twstock 台灣股市股票價格擷取
 
 * requests
 * Python 3
+* lxml
 
 ## Install
 
@@ -75,6 +76,32 @@ price: 215.0 211.5 208.5 210.0 208.5
 high :  16.2  16.8  16.4 16.75 16.75
 low  :  15.8  16.1 15.15  16.3 16.25
 price: 15.95 16.25 16.25  16.6  16.7
+```
+
+## Container CLI Tools
+
+### Build twstock_cli Image
+```
+$ git clone https://github.com/mlouielu/twstock
+$ cd twstock
+$ docker build . -t twstock
+```
+
+### Run Container as CLI
+
+```
+$ docker run --rm twstock -b 2330
+四大買賣點判斷 Best Four Point
+------------------------------
+2330: Buy   量大收紅, 三日均價由下往上
+```
+
+```
+$ docker run --rm twstock -s 2330
+-------------- 2330 ----------------
+high : 253.5 252.0 250.0 250.5 254.0
+low  : 250.5 245.5 240.0 246.5 248.0
+price: 251.5 246.5 248.5 248.0 253.5
 ```
 
 ## Update Codes
