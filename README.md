@@ -27,8 +27,9 @@ twstock 台灣股市股票價格擷取
 
 ## Requirements
 
-* requests
 * Python 3
+* lxml
+* requests
 
 ## Install
 
