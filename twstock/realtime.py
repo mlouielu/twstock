@@ -32,7 +32,7 @@ def _format_stock_info(data) -> dict:
     result['info']['name'] = data['n']
     result['info']['fullname'] = data['nf']
     result['info']['time'] = datetime.datetime.fromtimestamp(
-        int(data['tlong']) / 1000).strftime('%Y-%m-%d %H:%M:%S')
+        int(data['tlong']) / 1000 - 3600).strftime('%Y-%m-%d %H:%M:%S')
 
     # Process best result
     def _split_best(d):
