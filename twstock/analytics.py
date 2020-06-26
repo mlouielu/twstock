@@ -4,7 +4,7 @@
 class Analytics(object):
 
     def continuous(self, data):
-        diff = [1 if data.iloc[-i] > data.iloc[-i - 1] else -1 for i in range(1, len(data))]
+        diff = [1 if (data.iloc[-i] > data.iloc[-i - 1]).bool() else -1 for i in range(1, len(data))]
         cont = 0
         for v in diff:
             if v == diff[0]:
@@ -29,7 +29,7 @@ class Analytics(object):
 
     def ma_bias_ratio_pivot(self, data, sample_size=5, position=False):
         """Calculate pivot point"""
-        sample = data[-sample_size:]
+        sample = data[-sample_size:].to_list()
 
         if position is True:
             check_value = max(sample)
