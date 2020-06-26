@@ -4,7 +4,7 @@
 class Analytics(object):
 
     def continuous(self, data):
-        diff = [1 if data[-i] > data[-i - 1] else -1 for i in range(1, len(data))]
+        diff = [1 if data.iloc[-i] > data.iloc[-i - 1] else -1 for i in range(1, len(data))]
         cont = 0
         for v in diff:
             if v == diff[0]:
