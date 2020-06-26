@@ -204,7 +204,8 @@ class Stock(analytics.Analytics):
 
     @property
     def price(self):
-        return [d.close for d in self.data]
+        df = pd.DataFrame([d.close for d in self.data])
+        return df
 
     @property
     def high(self):

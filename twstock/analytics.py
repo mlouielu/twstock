@@ -14,18 +14,16 @@ class Analytics(object):
         return cont * diff[0]
 
     def moving_average(self, data, days):
-        result = []
-        data = data[:]
-        for _ in range(len(data) - days + 1):
-            result.append(round(sum(data[-days:]) / days, 2))
-            data.pop()
-        return result[::-1]
+        result = data.rolling(days).mean()        
+        return result
 
     def ma_bias_ratio(self, day1, day2):
         """Calculate moving average bias ratio"""
         data1 = self.moving_average(self.price, day1)
         data2 = self.moving_average(self.price, day2)
-        result = [data1[-i] - data2[-i] for i in range(1, min(len(data1), len(data2)) + 1)]
+        data1.dropna(inplace = True)
+        data2.dropna(inplace = True)
+        result = [data1.iloc[-i] - data2.iloc[-i] for i in range(1, min(len(data1), len(data2)) + 1)]
 
         return result[::-1]
 
