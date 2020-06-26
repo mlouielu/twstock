@@ -196,37 +196,45 @@ class Stock(analytics.Analytics):
 
     @property
     def capacity(self):
-        return [d.capacity for d in self.data]
+        df = pd.DataFrame([d.capacity for d in self.data], columns = ['capacity'])
+        return df
 
     @property
     def turnover(self):
-        return [d.turnover for d in self.data]
+        df = pd.DataFrame([d.turnover for d in self.data], columns = ['turnover'])
+        return df
 
     @property
     def price(self):
-        df = pd.DataFrame([d.close for d in self.data])
+        df = pd.DataFrame([d.close for d in self.data], columns = ['price'])
         return df
 
     @property
     def high(self):
-        return [d.high for d in self.data]
+        df = pd.DataFrame([d.high for d in self.data], columns = ['high'])
+        return df
 
     @property
     def low(self):
-        return [d.low for d in self.data]
+        df = pd.DataFrame([d.low for d in self.data], columns = ['low'])
+        return df
 
     @property
     def open(self):
-        return [d.open for d in self.data]
+        df = pd.DataFrame([d.open for d in self.data], columns = ['open'])
+        return df
 
     @property
     def close(self):
-        return [d.close for d in self.data]
+        df = pd.DataFrame([d.close for d in self.data], columns = ['price'])
+        return df
 
     @property
     def change(self):
-        return [d.change for d in self.data]
+        df = pd.DataFrame([d.change for d in self.data], columns = ['change'])
+        return df
 
     @property
     def transaction(self):
-        return [d.transaction for d in self.data]
+        df = pd.DataFrame([d.transaction for d in self.data], columns = ['transaction'])
+        return df
