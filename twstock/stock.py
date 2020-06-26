@@ -3,6 +3,7 @@
 import datetime
 import urllib.parse
 from collections import namedtuple
+import pandas as pd
 
 from twstock.proxy import get_proxies
 
@@ -183,6 +184,11 @@ class Stock(analytics.Analytics):
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
         return self.data
+
+    def get_df(self):
+        self.df = pd.DataFrame(self.data, columns = DATATUPLE._fields)
+        self.df.set_index('date', inplace = True)
+        return self.df
 
     @property
     def date(self):
