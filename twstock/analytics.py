@@ -4,7 +4,7 @@
 class Analytics(object):
 
     def continuous(self, data):
-        diff = [1 if (data.iloc[-i] > data.iloc[-i - 1]).bool() else -1 for i in range(1, len(data))]
+        diff = [1 if data.iloc[-i, 0] > data.iloc[-i - 1, 0] else -1 for i in range(1, len(data))]
         cont = 0
         for v in diff:
             if v == diff[0]:
@@ -23,23 +23,21 @@ class Analytics(object):
         data2 = self.moving_average(self.price, day2)
         data1.dropna(inplace = True)
         data2.dropna(inplace = True)
-        result = [data1.iloc[-i] - data2.iloc[-i] for i in range(1, min(len(data1), len(data2)) + 1)]
-
-        return result[::-1]
+        result = [data1.iloc[-i, 0] - data2.iloc[-i, 0] for i in range(1, min(len(data1), len(data2)) + 1)]
+        return result
 
     def ma_bias_ratio_pivot(self, data, sample_size=5, position=False):
         """Calculate pivot point"""
-        sample = data[-sample_size:].to_list()
-
+        sample = data[-sample_size:]
+        
         if position is True:
             check_value = max(sample)
             pre_check_value = max(sample) > 0
         elif position is False:
             check_value = min(sample)
             pre_check_value = max(sample) < 0
-
         return ((sample_size - sample.index(check_value) < 4 and
-                 sample.index(check_value) != sample_size - 1 and pre_check_value),
+                sample.index(check_value) != sample_size - 1 and pre_check_value),
                 sample_size - sample.index(check_value) - 1,
                 check_value)
 
@@ -63,34 +61,34 @@ class BestFourPoint(object):
         return self.bias_ratio(False)
 
     def best_buy_1(self):
-        return (self.stock.capacity[-1] > self.stock.capacity[-2] and
-                self.stock.price[-1] > self.stock.open[-1])
+        return (self.stock.capacity.iloc[-1, 0] > self.stock.capacity.iloc[-2, 0] and
+                self.stock.price.iloc[-1, 0] > self.stock.open.iloc[-1, 0])
 
     def best_buy_2(self):
-        return (self.stock.capacity[-1] < self.stock.capacity[-2] and
-                self.stock.price[-1] > self.stock.open[-2])
+        return (self.stock.capacity.iloc[-1, 0] < self.stock.capacity.iloc[-2, 0] and
+                self.stock.price.iloc[-1, 0] > self.stock.open.iloc[-2, 0])
 
     def best_buy_3(self):
         return self.stock.continuous(self.stock.moving_average(self.stock.price, 3)) == 1
 
     def best_buy_4(self):
-        return (self.stock.moving_average(self.stock.price, 3)[-1] >
-                self.stock.moving_average(self.stock.price, 6)[-1])
+        return (self.stock.moving_average(self.stock.price, 3).iloc[-1, 0] >
+                self.stock.moving_average(self.stock.price, 6).iloc[-1, 0])
 
     def best_sell_1(self):
-        return (self.stock.capacity[-1] > self.stock.capacity[-2] and
-                self.stock.price[-1] < self.stock.open[-1])
+        return (self.stock.capacity.iloc[-1, 0] > self.stock.capacity.iloc[-2, 0] and
+                self.stock.price.iloc[-1, 0] < self.stock.open.iloc[-1, 0])
 
     def best_sell_2(self):
-        return (self.stock.capacity[-1] < self.stock.capacity[-2] and
-                self.stock.price[-1] < self.stock.open[-2])
+        return (self.stock.capacity.iloc[-1, 0] < self.stock.capacity.iloc[-2, 0] and
+                self.stock.price.iloc[-1, 0] < self.stock.open.iloc[-2, 0])
 
     def best_sell_3(self):
         return self.stock.continuous(self.stock.moving_average(self.stock.price, 3)) == -1
 
     def best_sell_4(self):
-        return (self.stock.moving_average(self.stock.price, 3)[-1] <
-                self.stock.moving_average(self.stock.price, 6)[-1])
+        return (self.stock.moving_average(self.stock.price, 3).iloc[-1, 0] <
+                self.stock.moving_average(self.stock.price, 6).iloc[-1, 0])
 
     def best_four_point_to_buy(self):
         result = []

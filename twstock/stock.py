@@ -165,7 +165,7 @@ class Stock(analytics.Analytics):
         """Fetch year month data"""
         self.raw_data = [self.fetcher.fetch(year, month, self.sid)]
         self.data = self.raw_data[0]['data']
-        return self.data
+        return self.get_df()
 
     def fetch_from(self, year: int, month: int):
         """Fetch data from year, month to current year month data"""
@@ -175,7 +175,7 @@ class Stock(analytics.Analytics):
         for year, month in self._month_year_iter(month, year, today.month, today.year):
             self.raw_data.append(self.fetcher.fetch(year, month, self.sid))
             self.data.extend(self.raw_data[-1]['data'])
-        return self.data
+        return self.get_df()
 
     def fetch_31(self):
         """Fetch 31 days data"""
@@ -183,7 +183,7 @@ class Stock(analytics.Analytics):
         before = today - datetime.timedelta(days=60)
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
-        return self.data
+        return self.get_df()
 
     def get_df(self):
         self.df = pd.DataFrame(self.data, columns = DATATUPLE._fields)
