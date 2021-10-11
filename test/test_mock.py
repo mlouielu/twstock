@@ -9,7 +9,7 @@ class MockTest(unittest.TestCase):
     def test_mock_get_stock_info_raw_data(self):
         self.assertCountEqual(
             mock.get_stock_info('2330').keys(),
-            ['msgArray', 'userDelay', 'rtmessage', 'referer', 'queryTime', 'rtcode'])
+            ['msgArray', 'referer', 'userDelay', 'rtcode', 'queryTime', 'rtmessage', 'exKey', 'cachedAlive'])
 
     def test_mock_get_stock_info_msgarray(self):
         self.assertEqual(mock.get_stock_info('2330')['msgArray'][0]['c'], '2330')
