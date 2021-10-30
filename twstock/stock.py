@@ -4,6 +4,7 @@ import datetime
 import urllib.parse
 from collections import namedtuple
 
+from time import sleep
 from twstock.proxy import get_proxies
 
 try:
@@ -31,7 +32,7 @@ DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
 
 
 class BaseFetcher(object):
-    def fetch(self, year, month, sid, retry):
+    def fetch(self, year, month, sid, retry, retry_interval):
         pass
 
     def _convert_date(self, date):
@@ -52,11 +53,12 @@ class TWSEFetcher(BaseFetcher):
     def __init__(self):
         pass
 
-    def fetch(self, year: int, month: int, sid: str, retry: int=5):
+    def fetch(self, year: int, month: int, sid: str, retry: int=5, retry_interval: int=5):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
         for retry_i in range(retry):
             r = requests.get(self.REPORT_URL, params=params,
                              proxies=get_proxies())
+            sleep(retry_interval)
             try:
                 data = r.json()
             except JSONDecodeError:
@@ -99,11 +101,12 @@ class TPEXFetcher(BaseFetcher):
     def __init__(self):
         pass
 
-    def fetch(self, year: int, month: int, sid: str, retry: int=5):
+    def fetch(self, year: int, month: int, sid: str, retry: int=5, retry_interval: int=5):
         params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
         for retry_i in range(retry):
             r = requests.get(self.REPORT_URL, params=params,
                              proxies=get_proxies())
+            sleep(retry_interval)
             try:
                 data = r.json()
             except JSONDecodeError:
