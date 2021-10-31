@@ -202,6 +202,16 @@ class Stock(analytics.Analytics):
 
     def save(self):
         data_cache_save = self.data_cache
+        today = datetime.datetime.today()
+
+        # To avoid saving incomplete month data. ex. if today is 2020/11/12, then all data with 2020/11 will be ignore.
+        for dc_c in range(len(data_cache_save),0,-1):
+            dc_i = dc_c - 1 # from len(data_cache_save)-1 ~ 0
+            if data_cache_save[dc_i].date.month == today.month and data_cache_save[dc_i].date.month == today.month:
+                continue
+            else:
+                data_cache_save = data_cache_save[:dc_c]
+                break
 
         with open(self.dump_file, 'w') as f:
             json.dump(data_cache_save, f, indent=4, sort_keys=True, default=str)
