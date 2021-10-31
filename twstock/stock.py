@@ -148,7 +148,7 @@ class TPEXFetcher(BaseFetcher):
 
 class Stock(analytics.Analytics):
 
-    def __init__(self, sid: str, initial_fetch: bool=True):
+    def __init__(self, sid: str, initial_fetch: bool=True, skip_fetch_31: bool=False):
         self.sid = sid
         self.fetcher = TWSEFetcher(
         ) if codes[sid].market == '上市' else TPEXFetcher()
@@ -156,13 +156,14 @@ class Stock(analytics.Analytics):
         # Handle json cache
         self.dump_file = 'twstock_' + sid + '.json'
         self.data_cache = []
+        self.data_cache_ptr = 0
         self.data = []
         if os.path.exists(self.dump_file):
             # Load json cache if exists
             self.load()
 
         # Init data
-        if initial_fetch:
+        if initial_fetch and not skip_fetch_31:
             self.fetch_31()
 
     def _month_year_iter(self, start_month, start_year, end_month, end_year):
