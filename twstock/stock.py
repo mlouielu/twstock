@@ -6,6 +6,8 @@ from collections import namedtuple
 
 from time import sleep
 from twstock.proxy import get_proxies
+import os
+import json
 
 try:
     from json.decoder import JSONDecodeError
@@ -150,7 +152,13 @@ class Stock(analytics.Analytics):
         self.fetcher = TWSEFetcher(
         ) if codes[sid].market == '上市' else TPEXFetcher()
         self.raw_data = []
+        # Handle json cache
+        self.dump_file = 'twstock_' + sid + '.json'
+        self.data_cache = []
         self.data = []
+        if os.path.exists(self.dump_file):
+            # Load json cache if exists
+            self.load()
 
         # Init data
         if initial_fetch:
@@ -177,6 +185,7 @@ class Stock(analytics.Analytics):
         for year, month in self._month_year_iter(month, year, today.month, today.year):
             self.raw_data.append(self.fetcher.fetch(year, month, self.sid))
             self.data.extend(self.raw_data[-1]['data'])
+        self.save()
         return self.data
 
     def fetch_31(self):
@@ -186,6 +195,25 @@ class Stock(analytics.Analytics):
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
         return self.data
+
+    def save(self):
+        data_cache_save = self.data_cache
+
+        with open(self.dump_file, 'w') as f:
+            json.dump(data_cache_save, f, indent=4, sort_keys=True, default=str)
+
+    def load(self):
+        self.data_cache = []
+        data_cache_tmp = []
+        with open(self.dump_file, 'r') as f:
+            data_cache_tmp = json.load(f)
+
+        for data_i in range(len(data_cache_tmp)) :
+            # To package to namedtuple "Data"
+            entry_i = data_cache_tmp[data_i]
+            datetime_d = entry_i[0]
+            entry_i[0] = datetime.datetime.strptime(entry_i[0], '%Y-%m-%d %H:%M:%S')
+            self.data_cache.append(DATATUPLE(*entry_i))
 
     @property
     def date(self):
