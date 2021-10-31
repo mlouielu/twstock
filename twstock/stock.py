@@ -4,6 +4,7 @@ import datetime
 import urllib.parse
 from collections import namedtuple
 
+from operator import attrgetter
 from time import sleep
 from twstock.proxy import get_proxies
 import os
@@ -185,6 +186,7 @@ class Stock(analytics.Analytics):
         for year, month in self._month_year_iter(month, year, today.month, today.year):
             self.raw_data.append(self.fetcher.fetch(year, month, self.sid))
             self.data.extend(self.raw_data[-1]['data'])
+        self.check_data_valid()
         self.save()
         return self.data
 
@@ -194,6 +196,7 @@ class Stock(analytics.Analytics):
         before = today - datetime.timedelta(days=60)
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
+        self.check_data_valid()
         return self.data
 
     def save(self):
@@ -214,6 +217,28 @@ class Stock(analytics.Analytics):
             datetime_d = entry_i[0]
             entry_i[0] = datetime.datetime.strptime(entry_i[0], '%Y-%m-%d %H:%M:%S')
             self.data_cache.append(DATATUPLE(*entry_i))
+
+        self.check_data_valid()
+
+    def check_data_valid(self):
+        data_tmp = sorted(self.data,key=attrgetter('date'), reverse=False)
+        detect_potential_issue = False
+        if data_tmp != self.data:
+            print("Potential self.data order issue")
+            detect_potential_issue = True
+        if len(set(data_tmp)) != len(self.data):
+            print("Potential self.data duplicate issue")
+            detect_potential_issue = True
+
+        data_tmp = sorted(self.data_cache,key=attrgetter('date'), reverse=False)
+        if data_tmp != self.data_cache:
+            print("Potential self.data_cache order issue")
+            detect_potential_issue = True
+        if len(set(data_tmp)) != len(self.data_cache):
+            print("Potential self.data_cache duplicate issue")               
+            detect_potential_issue = True 
+        if detect_potential_issue == False :
+            print("Check data pass")
 
     @property
     def date(self):
