@@ -231,6 +231,10 @@ class Stock(analytics.Analytics):
 
         self.check_data_valid()
 
+    def organize_data_cache(self):
+        self.data_cache = list(set(self.data_cache))
+        self.data_cache = sorted(self.data_cache,key=attrgetter('date'), reverse=False)
+
     def check_data_valid(self):
         data_tmp = sorted(self.data,key=attrgetter('date'), reverse=False)
         detect_potential_issue = False
