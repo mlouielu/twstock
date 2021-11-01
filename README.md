@@ -200,6 +200,7 @@ import twstock
 stock = Stock('2330') # 會爬取近 31 天的收盤資料
 stock.fetch_31()      # 會爬取近 31 天的收盤資料
 stock.fetch_31(current_year = 2020, current_month = 12, current_day = 12) # 以 2020/12/12 往前爬取近 31 天的收盤資料
+stock.fetch_period(from_year=2019,from_month=2,from_day=1, to_year=2020,to_month=5,to_day=10) # To fetch a specific period of time
 # 將爬取的資料存成 .json 檔 ( ex. 2330.json )，會自動存檔
 # stock.save()
 # 在宣告 Stock('2330') 時就會確認有沒有 .json 檔，有的話會自動讀取

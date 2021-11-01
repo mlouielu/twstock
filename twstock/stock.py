@@ -219,16 +219,65 @@ class Stock(analytics.Analytics):
         self.data = self.raw_data[0]['data']
         return self.data
 
-    def fetch_from(self, year: int, month: int):
-        """Fetch data from year, month to current year month data"""
+    def fetch_period(self, from_year: int, from_month: int, from_day: int=0, to_year: int=0, to_month: int=0, to_day: int=0, retry: int=5, retry_interval: int=5):
         self.raw_data = []
         self.data = []
-        today = datetime.datetime.today()
-        for year, month in self._month_year_iter(month, year, today.month, today.year):
-            self.raw_data.append(self.fetcher.fetch(year, month, self.sid))
+        self.data_cache_ptr = 0
+        global REQ_COUNTER
+        REQ_COUNTER = 0
+
+        if to_year == 0 or to_month == 0:
+            today = datetime.datetime.today()
+            to_year = today.year
+            to_month = today.month
+
+        if from_year > to_year or ( from_year == to_year and from_month > to_month) or \
+                ( from_year == to_year and from_month == to_month and from_day > to_day and from_day != 0):
+            # check if invalid period
+            return
+
+        for year, month in self._month_year_iter(from_month, from_year, to_month, to_year):
+            self.raw_data.append(self.fetcher.fetch(year, month, self.sid, retry, retry_interval))
             self.data.extend(self.raw_data[-1]['data'])
+            # Copy fetched data to cache
+            if self.data_cache_ptr + 1 >= len(self.data_cache):
+                self.data_cache = self.data_cache + self.raw_data[-1]['data']
+            else:
+                self.data_cache = self.data_cache[:self.data_cache_ptr] +  self.raw_data[-1]['data'] + self.data_cache[self.data_cache_ptr:]
+            if month == 12:
+                # To decrease save data_cache frequency
+                self.save()
+
+        if from_day != 0:
+            start_index = 0
+            for dd_i in range(len(self.data)):
+                if self.data[dd_i].date.day < from_day and \
+                    self.data[dd_i].date.year == from_year and \
+                    self.data[dd_i].date.month == from_month :
+                    start_index += 1
+                else:
+                    break
+            self.data = self.data[start_index:]
+
+        if to_day != 0:
+            end_index = len(self.data)
+            for dd_ii in range(len(self.data),0,-1):
+                dd_i = dd_ii - 1
+                if self.data[dd_i].date.day > to_day and \
+                    self.data[dd_i].date.year == to_year and \
+                    self.data[dd_i].date.month == to_month :
+                    end_index -= 1
+                else:
+                    break
+            self.data = self.data[:end_index]
+
         self.check_data_valid()
         self.save()
+        return self.data
+
+    def fetch_from(self, from_year: int, from_month: int):
+        """Fetch data from year, month to current year month data"""
+        self.fetch_period(from_year=from_year, from_month=from_month)
         return self.data
 
     def fetch_31(self, current_year: int=0, current_month: int=0, current_day: int=0):
