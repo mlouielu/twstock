@@ -193,19 +193,20 @@ twstock.realtime.get(['2330', '2337', '2409'])  # 擷取當前三檔資訊
 
 # 將爬取結果存成 Json
 
-( 2021/10/30 Update )
+( 2021/10/30 Update `save()` and `load()` 會將 Stock 存成 json 檔，減少爬取的次數)
 
 ```python
 import twstock
 stock = Stock('2330') # 會爬取近 31 天的收盤資料
 stock.fetch_31()      # 會爬取近 31 天的收盤資料
+stock.fetch_31(current_year = 2020, current_month = 12, current_day = 12) # 以 2020/12/12 往前爬取近 31 天的收盤資料
 # 將爬取的資料存成 .json 檔 ( ex. 2330.json )，會自動存檔
 # stock.save()
 # 在宣告 Stock('2330') 時就會確認有沒有 .json 檔，有的話會自動讀取
 # stock.load() 
 ```
 
-會將 Stock 存成 json 檔，減少爬取的次數
+
 
 
 

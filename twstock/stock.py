@@ -231,10 +231,13 @@ class Stock(analytics.Analytics):
         self.save()
         return self.data
 
-    def fetch_31(self):
+    def fetch_31(self, current_year: int=0, current_month: int=0, current_day: int=0):
         """Fetch 31 days data"""
-        today = datetime.datetime.today()
-        before = today - datetime.timedelta(days=60)
+        if current_year == 0 or current_month == 0:
+            start_date = datetime.datetime.today()
+        else:
+            start_date = datetime.datetime( current_year, current_month, current_day)
+        before = start_date - datetime.timedelta(days=60)
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
         self.check_data_valid()
