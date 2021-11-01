@@ -166,11 +166,51 @@ class Stock(analytics.Analytics):
         if initial_fetch and not skip_fetch_31:
             self.fetch_31()
 
+    def search_data_cache(self, y, m):
+        # search data cache for _month_year_iter()
+        # if y and m find matched entry, copy data from self.data_cache to self.data 
+        # return value
+        #    1. True : find matched entry. Copy the data to self.data_cache.
+        #              And self.data_cache_ptr stores the index of self.data_cache.
+        #    2. False : Not found, need to send request to TWSE or TPEX.
+
+        if len(self.data_cache) == 0:
+            return False
+
+        find_match_entry = False
+
+        for data_cache_i in range(self.data_cache_ptr, len(self.data_cache)):
+            if self.data_cache[data_cache_i].date.year == y and \
+                    self.data_cache[data_cache_i].date.month == m :
+                # Hit in data cache, start loop until next miss. To move a month data to data cache.
+                # ex. If find 11/1 , then loop to add 11/1 ~ 11/30
+                self.data.append(self.data_cache[data_cache_i])       
+                find_match_entry = True
+            elif find_match_entry == True:
+                # First miss after hit, break
+                # Finish moving a month data.
+                self.data_cache_ptr = data_cache_i
+                break
+            elif self.data_cache[data_cache_i].date.year < y or \
+                ( self.data_cache[data_cache_i].date.year == y and \
+                    self.data_cache[data_cache_i].date.month < m ) :
+                # find datetime before first date of target month, continue search
+                self.data_cache_ptr = data_cache_i
+                continue
+            else:
+                # find datetime after last date of target month, break
+                self.data_cache_ptr = data_cache_i
+                break
+        return find_match_entry
+
     def _month_year_iter(self, start_month, start_year, end_month, end_year):
         ym_start = 12 * start_year + start_month - 1
         ym_end = 12 * end_year + end_month
         for ym in range(ym_start, ym_end):
             y, m = divmod(ym, 12)
+            if self.search_data_cache(y,m + 1):
+                # if match in data cache, skip it
+                continue
             yield y, m + 1
 
     def fetch(self, year: int, month: int):
