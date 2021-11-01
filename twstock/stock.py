@@ -30,6 +30,7 @@ except ImportError as e:
 
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
 TPEX_BASE_URL = 'http://www.tpex.org.tw/'
+REQ_COUNTER = 0
 DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
                                 'high', 'low', 'close', 'change', 'transaction'])
 
@@ -57,8 +58,12 @@ class TWSEFetcher(BaseFetcher):
         pass
 
     def fetch(self, year: int, month: int, sid: str, retry: int=5, retry_interval: int=5):
+        global REQ_COUNTER
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid}
         for retry_i in range(retry):
+            REQ_COUNTER += 1
+            if REQ_COUNTER % 12 == 0:
+                sleep(25)
             r = requests.get(self.REPORT_URL, params=params,
                              proxies=get_proxies())
             sleep(retry_interval)
@@ -105,8 +110,12 @@ class TPEXFetcher(BaseFetcher):
         pass
 
     def fetch(self, year: int, month: int, sid: str, retry: int=5, retry_interval: int=5):
+        global REQ_COUNTER
         params = {'d': '%d/%d' % (year - 1911, month), 'stkno': sid}
         for retry_i in range(retry):
+            REQ_COUNTER += 1
+            if REQ_COUNTER % 12 == 0:
+                sleep(25)
             r = requests.get(self.REPORT_URL, params=params,
                              proxies=get_proxies())
             sleep(retry_interval)
@@ -219,7 +228,7 @@ class Stock(analytics.Analytics):
         self.data = self.raw_data[0]['data']
         return self.data
 
-    def fetch_period(self, from_year: int, from_month: int, from_day: int=0, to_year: int=0, to_month: int=0, to_day: int=0, retry: int=5, retry_interval: int=5):
+    def fetch_period(self, from_year: int, from_month: int, from_day: int=0, to_year: int=0, to_month: int=0, to_day: int=0, retry: int=5, retry_interval: int=3):
         self.raw_data = []
         self.data = []
         self.data_cache_ptr = 0

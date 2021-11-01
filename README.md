@@ -23,6 +23,8 @@ twstock 台灣股市股票價格擷取
 
 ( 2021/10/30 Update : Add retry interval = 5 sec )
 
+( 2021/11/1 Update : 每 12 個 request 會休息 25 sec，超過的話也會被 ban)
+
 ## Documentation
 
 * [twstock documentation (正體中文)](http://twstock.readthedocs.io/zh_TW/latest)
