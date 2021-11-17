@@ -7,6 +7,23 @@ assignees: ''
 
 ---
 
+# Frequently Asked Questions
+
+## Q: realtime.get not working
+
+A: Check if you query the data in trading hours. Realtime query is no support outside the trading hours.
+A: 請先檢查目前是否在台股交易時段，本功能無法在非交易時段使用。
+
+## Q: Can not query specific symbol
+
+A: Please update your TWSE/TPEX codes (method below).
+A: 請先嘗試更新 TWSE/TPEX codes (方法在下方)。
+
+## Q: Unable to query in all methods
+
+A: Check if you reach query limitation, you may want to use proxies, or reduce your query frequency.
+A: 請檢查你是否請求資料過快，你可以嘗試使用 proxies，或是降低請求資料的頻率。
+
 # Before Submitting Bug Report
 
 在送出 Bug Report 前，請先更新你的 TWSE/TPEX 號碼後，重新測試你的問題會復現後再送出：
@@ -27,6 +44,8 @@ Done!
 >>> twstock.__update_codes()
 ```
 
+
+---
 
 **Describe the bug**
 A clear and concise description of what the bug is.
