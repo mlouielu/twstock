@@ -23,6 +23,7 @@ except ImportError as e:
     import analytics
     from codes import codes
 
+import os
 
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
 TPEX_BASE_URL = 'http://www.tpex.org.tw/'
@@ -142,16 +143,19 @@ class TPEXFetcher(BaseFetcher):
 
 class Stock(analytics.Analytics):
 
-    def __init__(self, sid: str, initial_fetch: bool=True):
+    cache_dir = os.path.expanduser('~/.twstock/')
+    def __init__(self, sid: str):
         self.sid = sid
         self.fetcher = TWSEFetcher(
         ) if codes[sid].market == '上市' else TPEXFetcher()
         self.raw_data = []
         self.data = []
+        self.cache_filename = self.cache_dir + self.sid
 
         # Init data
-        if initial_fetch:
+        if not self.read_from_cache():
             self.fetch_31()
+            self.update_cache()
 
     def _month_year_iter(self, start_month, start_year, end_month, end_year):
         ym_start = 12 * start_year + start_month - 1
@@ -183,6 +187,37 @@ class Stock(analytics.Analytics):
         self.fetch_from(before.year, before.month)
         self.data = self.data[-31:]
         return self.data
+
+    def read_from_cache(self):
+        if os.path.isfile(self.cache_filename):
+            # check if mtime is today
+            today = datetime.datetime.now().date()
+            if datetime.datetime.fromtimestamp(os.path.getmtime(self.cache_filename)).date() != today:
+                return False
+
+            with open(self.cache_filename, 'r') as f:
+                while True:
+                    data = f.readline().strip().split(',')
+                    if data[0] == '':
+                        break
+
+                    data[0] = data[0][:-9].replace('-', '/')
+                    self.data.append(self.fetcher._make_datatuple(data))
+
+            return True
+
+        return False
+
+    def update_cache(self):
+        if not os.path.exists(self.cache_dir):
+            os.mkdir(self.cache_dir)
+
+        with open(self.cache_filename, 'w') as f:
+            for d in self.data:
+                data = []
+                for val in d:
+                    data.append(str(val))
+                f.write(','.join(data) + '\n')
 
     @property
     def date(self):
