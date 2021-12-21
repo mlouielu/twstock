@@ -55,9 +55,11 @@ class MockRealtimeTest(unittest.TestCase):
 
         self.assertTrue(s['success'])
         self.assertEqual(s['info']['code'], '2330')
-        self.assertEqual(s['realtime']['latest_trade_price'], '214.50')
-        self.assertEqual(s['realtime']['best_bid_price'],
-                         ['214.00', '213.50', '213.00', '212.50', '212.00'])
+        # match 100 ~ 999
+        self.assertRegex(s['realtime']['latest_trade_price'], "[0-9]{3}\.[0-9]+")
+        for index in range(5):
+            # match 100 ~ 999
+            self.assertRegex(s['realtime']['best_bid_price'][index], "[0-9]{3}\.[0-9]+")
 
     @unittest.skip('Dont want to fix this, is about the code in realtime')
     def test_mock_multiple_stock_id(self):
