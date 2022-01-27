@@ -7,26 +7,39 @@ from twstock import realtime
 
 class RealtimeTest(unittest.TestCase):
     def test_realtime_field(self):
+        retry = 5
+        for _ in range(retry):
+            stock = realtime.get_raw('2330')
+            if stock['rtcode'] == '0000' and stock['rtmessage'] != 'OK':
+                continue
+            break
+
         self.assertCountEqual(
-            realtime.get_raw('2330').keys(),
+            stock.keys(),
             twstock.mock.get_stock_info('2330').keys())
 
     def test_realtime_get_raw(self):
-        self.assertIn('msgArray', realtime.get_raw('2330'))
+        retry = 5
+        for _ in range(retry):
+            stock = realtime.get_raw('2330')
+            if stock['rtcode'] == '0000' and stock['rtmessage'] != 'OK':
+                continue
+            self.assertIn('msgArray', realtime.get_raw('2330'))
+            break
 
     def test_realtime_get_blank(self):
         stock = realtime.get('')
 
         self.assertFalse(stock['success'])
-        self.assertIn('rtmessage', stock)
-        self.assertIn('rtcode', stock)
+        self.assertEqual(stock['rtcode'], '0000')
+        self.assertNotEqual(stock['rtmessage'], 'OK')
 
     def test_realtime_get_bad_id(self):
         stock = realtime.get('9999')
 
         self.assertFalse(stock['success'])
-        self.assertIn('rtmessage', stock)
-        self.assertIn('rtcode', stock)
+        self.assertEqual(stock['rtcode'], '5001')
+        self.assertEqual(stock['rtmessage'], 'Empty Query.')
 
         stock = realtime.get(['9999', '8888'])
 

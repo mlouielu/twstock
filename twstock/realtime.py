@@ -87,7 +87,7 @@ def get_raw(stocks) -> dict:
             return {'rtmessage': 'json decode error', 'rtcode': '5000'}
 
 
-def get(stocks, retry=3):
+def get(stocks, retry=10):
     # Prepare data
     data = get_raw(stocks) if not mock else twstock.mock.get(stocks)
 
@@ -95,7 +95,7 @@ def get(stocks, retry=3):
     data['success'] = False
 
     # JSONdecode error, could be too fast, retry
-    if data['rtcode'] == '5000':
+    if data['rtcode'] == '0000' and data['rtmessage'] != 'OK':
         # XXX: Stupit retry, you will dead here
         if retry:
             return get(stocks, retry - 1)
