@@ -40,6 +40,17 @@ def _format_stock_info(data) -> dict:
             return d.strip('_').split('_')
         return d
 
+    # Process change value and percentage
+    def _get_change(v1, v2):
+        try:
+            v1, v2 = float(v1), float(v2)
+            change = '{:+.4f}'.format(v2 - v1)
+            change_percentage = '{:+.4f}'.format((v2 - v1) / v1 * 100)
+            return (change, change_percentage)
+        except:
+            return ('-', '-')
+        
+
     # Realtime information
     result['realtime']['latest_trade_price'] = data.get('z', None)
     result['realtime']['trade_volume'] = data.get('tv', None)
@@ -51,6 +62,9 @@ def _format_stock_info(data) -> dict:
     result['realtime']['open'] = data.get('o', None)
     result['realtime']['high'] = data.get('h', None)
     result['realtime']['low'] = data.get('l', None)
+    result['realtime']['yesterday_close_price'] = data.get('y', None)
+    result['realtime']['change'], result['realtime']['change_percentage'] = _get_change(
+        data.get('y', None), data.get('z', None))
 
     # Success fetching
     result['success'] = True
