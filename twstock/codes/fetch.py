@@ -30,13 +30,19 @@ def make_row_tuple(typ, row):
 
 
 def fetch_data(url):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 啟用無頭模式
+
     # 初始化Selenium WebDriver
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     
-    # 使用WebDriver訪問指定的URL
+    # 使用WebDriver先訪問主頁面，再訪問指定的URL
+    main_page_url = "https://isin.twse.com.tw"
+    driver.get(main_page_url)
+    time.sleep(5)  # 等待JavaScript渲染完成
     driver.get(url)
-    time.sleep(10)  # 等待JavaScript渲染完成
+    time.sleep(5)  # 等待JavaScript渲染完成
 
     # 獲取網頁的源代碼
     page_source = driver.page_source
