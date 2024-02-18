@@ -30,6 +30,8 @@ twstock 台灣股市股票價格擷取
 * Python 3
 * lxml
 * requests
+* selenium
+* webdriver_manager
 
 ## Install
 

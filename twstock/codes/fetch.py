@@ -10,10 +10,13 @@ import os
 import csv
 from collections import namedtuple
 
-import requests
 from lxml import etree
 
-from twstock.proxy import get_proxies
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 TWSE_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=2'
 TPEX_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=4'
@@ -27,8 +30,25 @@ def make_row_tuple(typ, row):
 
 
 def fetch_data(url):
-    r = requests.get(url, proxies=get_proxies())
-    root = etree.HTML(r.text)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 啟用無頭模式
+
+    # 初始化Selenium WebDriver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    # 使用WebDriver先訪問主頁面，再訪問指定的URL
+    main_page_url = "https://isin.twse.com.tw"
+    driver.get(main_page_url)
+    time.sleep(5)  # 等待JavaScript渲染完成
+    driver.get(url)
+    time.sleep(5)  # 等待JavaScript渲染完成
+
+    # 獲取網頁的源代碼
+    page_source = driver.page_source
+    driver.quit()  # 關閉瀏覽器
+
+    root = etree.HTML(page_source)
     trs = root.xpath('//tr')[1:]
 
     result = []
