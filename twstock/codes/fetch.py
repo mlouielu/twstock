@@ -15,8 +15,8 @@ from lxml import etree
 
 from twstock.proxy import get_proxies
 
-TWSE_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=2'
-TPEX_EQUITIES_URL = 'http://isin.twse.com.tw/isin/C_public.jsp?strMode=4'
+TWSE_EQUITIES_URL = 'https://isin.twse.com.tw/isin/C_public.jsp?strMode=2'
+TPEX_EQUITIES_URL = 'https://isin.twse.com.tw/isin/C_public.jsp?strMode=4'
 ROW = namedtuple('Row', ['type', 'code', 'name', 'ISIN', 'start',
                          'market', 'group', 'CFI'])
 
