@@ -24,8 +24,8 @@ except ImportError as e:
     from codes import codes
 
 
-TWSE_BASE_URL = "http://www.twse.com.tw/"
-TPEX_BASE_URL = "http://www.tpex.org.tw/"
+TWSE_BASE_URL = "https://www.twse.com.tw/"
+TPEX_BASE_URL = "https://www.tpex.org.tw/"
 DATATUPLE = namedtuple(
     "Data",
     [
