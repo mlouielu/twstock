@@ -85,7 +85,7 @@ class AnalyticsTest(unittest.TestCase):
 class BestFourPointTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.stock = stock.Stock('2330')
+        self.stock = stock.Stock("2330")
         self.stock.fetch(2015, 5)
         self.legacy = legacy.LegacyBestFourPoint(self.stock)
         self.ng = analytics.BestFourPoint(self.stock)
@@ -119,27 +119,24 @@ class BestFourPointTest(unittest.TestCase):
         self.assertEqual(self.ng.best_sell_4(), self.legacy.best_sell_4())
 
     def test_best_four_point_to_buy(self):
-        self.assertEqual(self.ng.best_four_point_to_buy(),
-                         self.legacy.best_four_point_to_buy())
+        self.assertEqual(
+            self.ng.best_four_point_to_buy(), self.legacy.best_four_point_to_buy()
+        )
 
     def test_best_four_point_to_sell(self):
-        self.assertEqual(self.ng.best_four_point_to_sell(),
-                         self.legacy.best_four_point_to_sell())
+        self.assertEqual(
+            self.ng.best_four_point_to_sell(), self.legacy.best_four_point_to_sell()
+        )
 
     def test_best_four_point(self):
         self.stock.fetch(2014, 5)
-        self.assertEqual(self.ng.best_four_point(),
-                         self.legacy.best_four_point())
+        self.assertEqual(self.ng.best_four_point(), self.legacy.best_four_point())
 
         self.stock.fetch(2015, 5)
-        self.assertEqual(self.ng.best_four_point(),
-                         self.legacy.best_four_point())
+        self.assertEqual(self.ng.best_four_point(), self.legacy.best_four_point())
 
         self.stock.fetch(2016, 5)
-        self.assertEqual(self.ng.best_four_point(),
-                         self.legacy.best_four_point())
+        self.assertEqual(self.ng.best_four_point(), self.legacy.best_four_point())
 
         self.stock.fetch(2017, 5)
-        self.assertEqual(self.ng.best_four_point(),
-                         self.legacy.best_four_point())
-
+        self.assertEqual(self.ng.best_four_point(), self.legacy.best_four_point())
