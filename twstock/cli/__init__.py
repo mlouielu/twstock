@@ -9,10 +9,12 @@ from twstock.cli import realtime
 def run():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-b', '--bfp', nargs='+')
-    parser.add_argument('-s', '--stock', nargs='+')
-    parser.add_argument('-r', '--realtime', nargs='+')
-    parser.add_argument('-U', '--upgrade-codes', action='store_true', help='Update entites codes')
+    parser.add_argument("-b", "--bfp", nargs="+")
+    parser.add_argument("-s", "--stock", nargs="+")
+    parser.add_argument("-r", "--realtime", nargs="+")
+    parser.add_argument(
+        "-U", "--upgrade-codes", action="store_true", help="Update entites codes"
+    )
     args = parser.parse_args()
 
     if args.bfp:
@@ -22,8 +24,8 @@ def run():
     elif args.realtime:
         realtime.run(args.realtime)
     elif args.upgrade_codes:
-        print('Start to update codes')
+        print("Start to update codes")
         __update_codes()
-        print('Done!')
+        print("Done!")
     else:
         parser.print_help()

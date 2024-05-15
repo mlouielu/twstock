@@ -3,7 +3,8 @@
 import json
 
 
-TSE_2330_TW = ["""
+TSE_2330_TW = [
+    """
 {"msgArray": [{"ts": "0", "tk0": "2330.tw_tse_20170724_B_9999778918", "tk1":
 "2330.tw_tse_20170724_B_9999777950", "tlong": "1500860849000", "f":
 "853_1193_972_1209_817_", "ex": "tse", "g": "1221_1530_817_1038_1193_", "d":
@@ -19,7 +20,8 @@ TSE_2330_TW = ["""
 -1, "sysDate": "20170724", "sessionKey": "tse_2330.tw_20170724|",
 "sessionFromTime": -1, "stockInfoItem": 2065, "showChart": false,
 "sessionStr": "UserSession", "stockInfo": 204322}, "rtcode": "0000"}
-""", """
+""",
+    """
 {"msgArray": [{"ts": "0", "tk0": "2330.tw_tse_20170724_B_9999766224", "tk1":
 "2330.tw_tse_20170724_B_9999765954", "tlong": "1500861105000", "f":
 "1059_1079_1014_1229_907_", "ex": "tse", "g": "1455_1598_797_1019_1134_", "d":
@@ -35,7 +37,8 @@ TSE_2330_TW = ["""
 -1, "sysDate": "20170724", "sessionKey": "tse_2330.tw_20170724|",
 "sessionFromTime": -1, "stockInfoItem": 2055, "showChart": false,
 "sessionStr": "UserSession", "stockInfo": 130895}, "rtcode": "0000"}
-""", """
+""",
+    """
 {"msgArray": [{"ts": "0", "tk0": "2330.tw_tse_20170724_B_9999760446", "tk1":
 "2330.tw_tse_20170724_B_9999759382", "tlong": "1500861243000", "f":
 "1034_1028_1009_1253_933_", "ex": "tse", "g": "1466_1625_798_987_1117_", "d":
@@ -51,11 +54,12 @@ TSE_2330_TW = ["""
 -1, "sysDate": "20170724", "sessionKey": "tse_2330.tw_20170724|",
 "sessionFromTime": -1, "stockInfoItem": 1602, "showChart": false,
 "sessionStr": "UserSession", "stockInfo": 119518}, "rtcode": "0000"}
-"""]
+""",
+]
 
 
 stock_list = {
-    '2330': TSE_2330_TW,
+    "2330": TSE_2330_TW,
 }
 
 
@@ -64,13 +68,13 @@ def get_stock_info(stock_id, index=0):
 
 
 def get_stocks_info(stocks):
-    data = json.loads(stock_list['2330'][0])
+    data = json.loads(stock_list["2330"][0])
     for _ in range(len(stocks)):
-        data['msgArray'].append(data['msgArray'][0])
+        data["msgArray"].append(data["msgArray"][0])
     return data
+
 
 def get(stocks):
     if isinstance(stocks, list):
         return get_stocks_info(stocks)
     return get_stock_info(stocks)
-

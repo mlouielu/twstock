@@ -6,7 +6,7 @@ from twstock import cli
 
 class CLIFunctionTest(unittest.TestCase):
     def setUp(self):
-        self.stocks = ['2330', '6223']
+        self.stocks = ["2330", "6223"]
 
     def test_best_four_point(self):
         cli.best_four_point.run(self.stocks)
