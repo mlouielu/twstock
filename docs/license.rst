@@ -1,7 +1,7 @@
 LICENSE
 ---------------------
 
-Copyright (c) 2017-2019 Louie Lu
+Copyright (c) 2017-2024 Louie Lu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
