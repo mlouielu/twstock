@@ -1,0 +1,24 @@
+name: ci
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} - ${{ github.event_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        run:
+          |
+            pip install pipenv
+            pipenv install --dev
+      - name: Run tests
+        run: pipenv run coverage run --source=twstock -m unittest
+      - name: Create reports
+        run:
+          |
+            pipenv run coveralls
+            pipenv run codecov
