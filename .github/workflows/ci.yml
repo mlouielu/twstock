@@ -24,3 +24,5 @@ jobs:
           |
             pipenv run coveralls
             pipenv run codecov
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
