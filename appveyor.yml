@@ -1,0 +1,28 @@
+environment:
+  global:
+    FLIT_ROOT: C:\projects\flit
+  matrix:
+    - PYTHON: 'C:\Python34'
+    - PYTHON: 'C:\Python35'
+    - PYTHON: 'C:\Python36'
+    - PYTHON: 'C:\Python36-x64'
+      PYTHON_VERSION: '3.6.2'
+      PYTHON_ARCH: '64'
+
+branches:
+  only:
+    - master
+
+init:
+  - echo %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
+
+install:
+  - 'set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%'
+  - 'python -m pip install -U pip'
+  - 'python -m pip install pipenv'
+
+build_script:
+  - 'python -m pipenv install --dev'
+
+test_script:
+  - 'python -m pipenv run coverage run --source=twstock -m unittest'
