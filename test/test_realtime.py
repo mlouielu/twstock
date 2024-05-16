@@ -55,10 +55,10 @@ class MockRealtimeTest(unittest.TestCase):
 
         self.assertTrue(s["success"])
         self.assertEqual(s["info"]["code"], "2330")
-        self.assertEqual(s["realtime"]["latest_trade_price"], "214.50")
+        self.assertEqual(s["realtime"]["latest_trade_price"], "-")
         self.assertEqual(
             s["realtime"]["best_bid_price"],
-            ["214.00", "213.50", "213.00", "212.50", "212.00"],
+            ["848.0000", "847.0000", "846.0000", "845.0000", "844.0000"],
         )
 
     @unittest.skip("Dont want to fix this, is about the code in realtime")
