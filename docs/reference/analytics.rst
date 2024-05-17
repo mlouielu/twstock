@@ -37,6 +37,8 @@
       :type data: list
       :param days: 天數
       :type days: int
+      :param skipna: 是否過濾缺失資料
+      :type: bool
 
       分析 ``data`` 中之 ``days`` 日之平均數::
 
