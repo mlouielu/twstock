@@ -154,7 +154,7 @@ class TPEXFetcher(BaseFetcher):
 class Stock(analytics.Analytics):
     def __init__(self, sid: str, initial_fetch: bool = True):
         self.sid = sid
-        self.fetcher = TWSEFetcher() if codes[sid].market == "上市" else TPEXFetcher()
+        self.fetcher = TWSEFetcher() if codes[sid].market[:2] == "上市" else TPEXFetcher()
         self.raw_data = []
         self.data = []
 
