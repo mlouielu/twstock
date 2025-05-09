@@ -12,7 +12,8 @@ from collections import namedtuple
 
 
 ROW = namedtuple(
-    "StockCodeInfo", ["type", "code", "name", "ISIN", "start", "market", "group", "CFI"]
+    "StockCodeInfo",
+    ["type", "code", "name", "ISIN", "start", "market", "group", "CFI", "data_source"],
 )
 PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 TPEX_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, "tpex_equities.csv")
@@ -29,7 +30,7 @@ def read_csv(path, types):
         reader = csv.reader(csvfile)
         csvfile.readline()
         for row in reader:
-            row = ROW(*(item.strip() for item in row))
+            row = ROW(*(item.strip() for item in row), data_source=types)
             codes[row.code] = row
             if types == "tpex":
                 tpex[row.code] = row
