@@ -2,18 +2,39 @@
 requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "twstock"
-author = "Louie Lu"
-author-email = "git@louie.lu"
-maintainer = "Louie Lu"
-maintainer-email = "git@louie.lu"
-home-page = "https://github.com/mlouielu/twstock"
+[project]
+name = "twstock"
+description = "Taiwan Stock Utility"
+authors = [
+    {name = "Louie Lu", email = "git@louie.lu"},
+]
+maintainers = [
+    {name = "Louie Lu", email = "git@louie.lu"},
+]
 requires-python = ">=3.5"
-requires = [ "requests",]
-description-file = "README.md"
-classifiers = [ "License :: OSI Approved :: MIT License", "Programming Language :: Python :: 3",]
+readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "requests",
+    "lxml",
+]
+dynamic = ["version"]
 
+[project.urls]
+homepage = "https://github.com/mlouielu/twstock"
+repository = "https://github.com/mlouielu/twstock"
 
-[tool.flit.scripts]
+[project.scripts]
 twstock = "twstock.cli:run"
+
+[dependency-groups]
+dev = [
+    "coveralls",
+    "codecov",
+    "wheel",
+    "flit>=3.2.0",
+]
