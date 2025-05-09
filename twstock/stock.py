@@ -160,9 +160,29 @@ class TPEXFetcher(BaseFetcher):
         return [self._make_datatuple(d) for d in original_data["tables"][0]["data"]]
 
 
+DATA_FETCHER = {
+    "twse": TWSEFetcher,
+    "tpex": TPEXFetcher,
+}
+
+
 class Stock(analytics.Analytics):
-    def __init__(self, sid: str, initial_fetch: bool = True):
-        if sid not in codes:
+    def __init__(
+        self,
+        sid: str,
+        initial_fetch: bool = True,
+        force_data_source: str = None,
+    ):
+        """
+        Args:
+            sid (str): Stock ID
+            initial_fetch (bool): Fetch data when initializing
+            force_data_source (str): Force data source, can be 'twse' or 'tpex',
+                if not set, will use the data source from stock codes database,
+                if set, it also implied that we will not check if the stock ID is in the database.
+        """
+
+        if force_data_source is None and sid not in codes:
             raise StockIDNotFoundError(
                 f'Stock ID "{sid}" not found in database.\n'
                 "Either you misspelled it or it is not in the database.\n"
@@ -172,9 +192,9 @@ class Stock(analytics.Analytics):
             )
 
         self.sid = sid
-        self.fetcher = (
-            TWSEFetcher() if codes[sid].data_source == "twse" else TPEXFetcher()
-        )
+        self.fetcher = DATA_FETCHER.get(
+            force_data_source if force_data_source else codes[sid].data_source
+        )()
         self.raw_data = []
         self.data = []
 
