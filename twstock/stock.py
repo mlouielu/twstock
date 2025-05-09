@@ -42,6 +42,13 @@ DATATUPLE = namedtuple(
 )
 
 
+class StockIDNotFoundError(KeyError):
+    """Exception raised when a stock ID is not found in the database."""
+
+    def __str__(self):
+        return super().__str__().replace("\\n", "\n")
+
+
 class BaseFetcher(object):
     def fetch(self, year, month, sid, retry):
         pass
@@ -155,6 +162,15 @@ class TPEXFetcher(BaseFetcher):
 
 class Stock(analytics.Analytics):
     def __init__(self, sid: str, initial_fetch: bool = True):
+        if sid not in codes:
+            raise StockIDNotFoundError(
+                f'Stock ID "{sid}" not found in database.\n'
+                "Either you misspelled it or it is not in the database.\n"
+                "If you believe your stock ID is correct, please update stock codes database using:\n"
+                "  - CLI: twstock -U\n"
+                '  - Python: python -c "import twstock; twstock.__update_codes()"'
+            )
+
         self.sid = sid
         self.fetcher = (
             TWSEFetcher() if codes[sid].data_source == "twse" else TPEXFetcher()
