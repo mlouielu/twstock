@@ -42,7 +42,7 @@ By Source
 ```
 $ git clone https://github.com/mlouielu/twstock
 $ cd twstock
-$ pipenv install
+$ python -m pip install -e .
 ```
 
 By Source & install
