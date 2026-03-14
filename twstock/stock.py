@@ -96,7 +96,7 @@ class TWSEFetcher(BaseFetcher):
             0.0 if data[7].replace(",", "") == "X0.00" else data[7].replace(",", "")
         )
         data[8] = int(data[8].replace(",", ""))
-        return DATATUPLE(*data)
+        return DATATUPLE(*data[:9])
 
     def purify(self, original_data):
         return [self._make_datatuple(d) for d in original_data["data"]]
@@ -145,7 +145,7 @@ class TPEXFetcher(BaseFetcher):
         data[6] = None if data[6] == "--" else float(data[6].replace(",", ""))
         data[7] = float(data[7].replace(",", ""))
         data[8] = int(data[8].replace(",", ""))
-        return DATATUPLE(*data)
+        return DATATUPLE(*data[:9])
 
     def purify(self, original_data):
         return [self._make_datatuple(d) for d in original_data["aaData"]]
