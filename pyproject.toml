@@ -1,6 +1,6 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
 
 [project]
 name = "twstock"
@@ -24,6 +24,9 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
 [project.urls]
 homepage = "https://github.com/mlouielu/twstock"
 repository = "https://github.com/mlouielu/twstock"
@@ -36,5 +39,4 @@ dev = [
     "coveralls",
     "codecov",
     "wheel",
-    "flit>=3.2.0",
 ]
