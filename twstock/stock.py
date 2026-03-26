@@ -38,6 +38,7 @@ DATATUPLE = namedtuple(
         "close",
         "change",
         "transaction",
+        "note",
     ],
 )
 
@@ -103,6 +104,7 @@ class TWSEFetcher(BaseFetcher):
             0.0 if data[7].replace(",", "") == "X0.00" else data[7].replace(",", "")
         )
         data[8] = int(data[8].replace(",", ""))
+        data[9] = data[9]
         return DATATUPLE(*data)
 
     def purify(self, original_data):
@@ -154,6 +156,7 @@ class TPEXFetcher(BaseFetcher):
         data[6] = None if data[6] == "--" else float(data[6].replace(",", ""))
         data[7] = float(data[7].replace(",", ""))
         data[8] = int(data[8].replace(",", ""))
+        data[9] = data[9]
         return DATATUPLE(*data)
 
     def purify(self, original_data):
