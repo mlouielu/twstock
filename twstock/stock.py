@@ -156,8 +156,7 @@ class TPEXFetcher(BaseFetcher):
         data[6] = None if data[6] == "--" else float(data[6].replace(",", ""))
         data[7] = float(data[7].replace(",", ""))
         data[8] = int(data[8].replace(",", ""))
-        data[9] = data[9]
-        return DATATUPLE(*data)
+        return DATATUPLE(*data, note="")
 
     def purify(self, original_data):
         return [self._make_datatuple(d) for d in original_data["tables"][0]["data"]]
