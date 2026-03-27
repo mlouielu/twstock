@@ -38,6 +38,7 @@ DATATUPLE = namedtuple(
         "close",
         "change",
         "transaction",
+        # only TWSE return "note", TPEX doesn't return "note"
         "note",
     ],
 )
@@ -156,7 +157,12 @@ class TPEXFetcher(BaseFetcher):
         data[6] = None if data[6] == "--" else float(data[6].replace(",", ""))
         data[7] = float(data[7].replace(",", ""))
         data[8] = int(data[8].replace(",", ""))
-        data[9] = data[9]
+        # TPEX 目前不像 TWSE 會回傳 note 欄位，因此走 else, 若未來 TPEX 改為會回傳 note 欄位, 則走 if
+        if len(data) > 9:
+            data[9] = data[9]
+        else:
+            data.insert(9, 0)
+        
         return DATATUPLE(*data)
 
     def purify(self, original_data):
