@@ -21,41 +21,11 @@ wheels = [
 
 [[package]]
 name = "certifi"
-version = "2021.10.8"
+version = "2024.7.4"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version < '3.6'",
-]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/ae/d26450834f0acc9e3d1f74508da6df1551ceab6c2ce0766a593362d6d57f/certifi-2021.10.8.tar.gz", hash = "sha256:78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872", size = 151214, upload-time = "2021-10-08T19:32:15.277Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/02/a95f2b11e207f68bc64d7aae9666fed2e2b3f307748d5123dffb72a1bbea/certifi-2024.7.4.tar.gz", hash = "sha256:5a1e7645bc0ec61a09e26c36f6106dd4cf40c6db3a1fb6352b0244e7fb057c7b", size = 164065, upload-time = "2024-07-04T01:36:11.653Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/37/45/946c02767aabb873146011e665728b680884cd8fe70dde973c640e45b775/certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569", size = 149195, upload-time = "2021-10-08T19:32:10.712Z" },
-]
-
-[[package]]
-name = "certifi"
-version = "2025.4.26"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version == '3.6.*'",
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/9e/c05b3920a3b7d20d3d3310465f50348e5b3694f4f88c6daf736eef3024c4/certifi-2025.4.26.tar.gz", hash = "sha256:0a816057ea3cdefcef70270d2c515e4506bbc954f417fa5ade2021213bb8f0c6", size = 160705, upload-time = "2025-04-26T02:12:29.51Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4a/7e/3db2bd1b1f9e95f7cddca6d6e75e2f2bd9f51b1246e546d88addca0106bd/certifi-2025.4.26-py3-none-any.whl", hash = "sha256:30350364dfe371162649852c63336a15c70c6510c2ad5015b21c2345311805f3", size = 159618, upload-time = "2025-04-26T02:12:27.662Z" },
-]
-
-[[package]]
-name = "certifi"
-version = "2026.2.25"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.10'",
-    "python_full_version == '3.9.*'",
-    "python_full_version == '3.8.*'",
-    "python_full_version == '3.7.*'",
-]
-sdist = { url = "https://files.pythonhosted.org/packages/af/2d/7bf41579a8986e348fa033a31cdd0e4121114f6bce2457e8876010b092dd/certifi-2026.2.25.tar.gz", hash = "sha256:e887ab5cee78ea814d3472169153c2d12cd43b14bd03329a39a9c6e2e80bfba7", size = 155029, upload-time = "2026-02-25T02:54:17.342Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/3c/c17fb3ca2d9c3acff52e30b309f538586f9f5b9c9cf454f3845fc9af4881/certifi-2026.2.25-py3-none-any.whl", hash = "sha256:027692e4402ad994f1c42e52a4997a9763c646b73e4096e4d5d6db8af1d6f0fa", size = 153684, upload-time = "2026-02-25T02:54:15.766Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/d5/c84e1a17bf61d4df64ca866a1c9a913874b4e9bdc131ec689a0ad013fb36/certifi-2024.7.4-py3-none-any.whl", hash = "sha256:c198e21b1289c2ab85ee4e67bb4b4ef3ead0892059901a8d5b622f24a1101e90", size = 162960, upload-time = "2024-07-04T01:36:09.038Z" },
 ]
 
 [[package]]
@@ -64,7 +34,6 @@ version = "2.0.12"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version == '3.6.*'",
-    "python_full_version < '3.6'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/56/31/7bcaf657fafb3c6db8c787a865434290b726653c912085fbd371e9b92e1c/charset-normalizer-2.0.12.tar.gz", hash = "sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597", size = 79105, upload-time = "2022-02-12T14:33:13.788Z" }
 wheels = [
@@ -236,7 +205,8 @@ dependencies = [
     { name = "coverage", version = "7.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "coverage", version = "7.13.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.7'" },
+    { name = "requests", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
+    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
     { name = "requests", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
     { name = "requests", version = "2.32.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "requests", version = "2.32.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
@@ -765,7 +735,8 @@ dependencies = [
     { name = "coverage", version = "6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
     { name = "coverage", version = "6.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
     { name = "docopt", marker = "python_full_version < '3.8'" },
-    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.7'" },
+    { name = "requests", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
+    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
     { name = "requests", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c2/c5/6b8254092117fa366b022fbee9434224483ba38e0bbf36e80836bf10692a/coveralls-3.3.1.tar.gz", hash = "sha256:b32a8bb5d2df585207c119d6c01567b81fba690c9c10a753bfe27a335bfc43ea", size = 17964, upload-time = "2021-11-11T21:00:05.24Z" }
@@ -815,18 +786,6 @@ name = "docopt"
 version = "0.6.2"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a2/55/8f8cab2afd404cf578136ef2cc5dfb50baa1761b68c9da1fb1e4eed343c9/docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491", size = 25901, upload-time = "2014-06-16T11:18:57.406Z" }
-
-[[package]]
-name = "idna"
-version = "3.7"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version < '3.6'",
-]
-sdist = { url = "https://files.pythonhosted.org/packages/21/ed/f86a79a07470cb07819390452f178b3bef1d375f2ec021ecfc709fc7cf07/idna-3.7.tar.gz", hash = "sha256:028ff3aadf0609c1fd278d8ea3089299412a7a8b9bd005dd08b9f8285bcb5cfc", size = 189575, upload-time = "2024-04-11T03:34:43.276Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e5/3e/741d8c82801c347547f8a2a06aa57dbb1992be9e948df2ea0eda2c8b79e8/idna-3.7-py3-none-any.whl", hash = "sha256:82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0", size = 66836, upload-time = "2024-04-11T03:34:41.447Z" },
-]
 
 [[package]]
 name = "idna"
@@ -1278,19 +1237,28 @@ wheels = [
 
 [[package]]
 name = "requests"
+version = "2.15.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.6'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6d/ed/3adebdc29ca33f11bca00c38c72125cd4a51091e13685375ba4426fb59dc/requests-2.15.1.tar.gz", hash = "sha256:e5659b9315a0610505e050bb7190bf6fa2ccee1ac295f2b760ef9d8a03ebbb2e", size = 548172, upload-time = "2017-05-27T02:14:22.414Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fa/a5/e04c4607dc96e3e6b22dfa13ba8776c64bb65cb97ab90f05a3ee14096a0a/requests-2.15.1-py2.py3-none-any.whl", hash = "sha256:ff753b2196cd18b1bbeddc9dcd5c864056599f7a7d9a4fb5677e723efa2b7fb9", size = 558730, upload-time = "2017-05-27T02:14:19.048Z" },
+]
+
+[[package]]
+name = "requests"
 version = "2.27.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version == '3.6.*'",
-    "python_full_version < '3.6'",
 ]
 dependencies = [
-    { name = "certifi", version = "2021.10.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
-    { name = "certifi", version = "2025.4.26", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
-    { name = "charset-normalizer", version = "2.0.12", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.7'" },
-    { name = "idna", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
+    { name = "certifi", marker = "python_full_version == '3.6.*'" },
+    { name = "charset-normalizer", version = "2.0.12", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
     { name = "idna", version = "3.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
-    { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.7'" },
+    { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/60/f3/26ff3767f099b73e0efa138a9998da67890793bfa475d8278f84a30fec77/requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61", size = 106758, upload-time = "2022-01-05T15:40:51.698Z" }
 wheels = [
@@ -1305,7 +1273,7 @@ resolution-markers = [
     "python_full_version == '3.7.*'",
 ]
 dependencies = [
-    { name = "certifi", version = "2026.2.25", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
+    { name = "certifi", marker = "python_full_version == '3.7.*'" },
     { name = "charset-normalizer", version = "3.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
     { name = "idna", version = "3.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
     { name = "urllib3", version = "2.0.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
@@ -1323,7 +1291,7 @@ resolution-markers = [
     "python_full_version == '3.8.*'",
 ]
 dependencies = [
-    { name = "certifi", version = "2026.2.25", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "certifi", marker = "python_full_version == '3.8.*'" },
     { name = "charset-normalizer", version = "3.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "idna", version = "3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "urllib3", version = "2.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
@@ -1341,7 +1309,7 @@ resolution-markers = [
     "python_full_version == '3.9.*'",
 ]
 dependencies = [
-    { name = "certifi", version = "2026.2.25", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "certifi", marker = "python_full_version == '3.9.*'" },
     { name = "charset-normalizer", version = "3.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "idna", version = "3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "urllib3", version = "2.6.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
@@ -1359,7 +1327,7 @@ resolution-markers = [
     "python_full_version >= '3.10'",
 ]
 dependencies = [
-    { name = "certifi", version = "2026.2.25", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "certifi", marker = "python_full_version >= '3.10'" },
     { name = "charset-normalizer", version = "3.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "idna", version = "3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "urllib3", version = "2.6.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
@@ -1452,7 +1420,8 @@ dependencies = [
     { name = "lxml", version = "5.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
     { name = "lxml", version = "5.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.6' and python_full_version < '3.8'" },
     { name = "lxml", version = "6.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
-    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.7'" },
+    { name = "requests", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.6'" },
+    { name = "requests", version = "2.27.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.6.*'" },
     { name = "requests", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.7.*'" },
     { name = "requests", version = "2.32.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "requests", version = "2.32.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
@@ -1505,7 +1474,6 @@ version = "1.26.20"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version == '3.6.*'",
-    "python_full_version < '3.6'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz", hash = "sha256:40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32", size = 307380, upload-time = "2024-08-29T15:43:11.37Z" }
 wheels = [
