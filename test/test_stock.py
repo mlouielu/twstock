@@ -1,6 +1,9 @@
 import datetime
 import unittest
+import vcr
 from twstock import stock
+
+MY_VCR = vcr.VCR(cassette_library_dir="test/cassettes", record_mode="none")
 
 
 class FetcherTest(object):
@@ -194,10 +197,11 @@ class StockTest(object):
 
 class TWSEStockTest(unittest.TestCase, StockTest):
     @classmethod
+    @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(cls):
         cls.stk = stock.Stock("2330")
 
-    @unittest.skip("Flaky: depends on live API availability for historical data")
+    @MY_VCR.use_cassette("twse_2330_2015_5.yaml")
     def test_price(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
@@ -229,7 +233,7 @@ class TWSEStockTest(unittest.TestCase, StockTest):
             ],
         )
 
-    @unittest.skip("Flaky: depends on live API availability for historical data")
+    @MY_VCR.use_cassette("twse_2330_2015_5.yaml")
     def test_capacity(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)
@@ -264,10 +268,11 @@ class TWSEStockTest(unittest.TestCase, StockTest):
 
 class TPEXStockTest(unittest.TestCase, StockTest):
     @classmethod
+    @MY_VCR.use_cassette("tpex_6223_recent.yaml")
     def setUpClass(cls):
         cls.stk = stock.Stock("6223")
 
-    @unittest.skip("Flaky: depends on live API availability for historical data")
+    @MY_VCR.use_cassette("tpex_6223_2015_5.yaml")
     def test_price(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
@@ -299,7 +304,7 @@ class TPEXStockTest(unittest.TestCase, StockTest):
             ],
         )
 
-    @unittest.skip("Flaky: depends on live API availability for historical data")
+    @MY_VCR.use_cassette("tpex_6223_2015_5.yaml")
     def test_capacity(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)

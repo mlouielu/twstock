@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.33.0
+    method: GET
+    uri: http://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2015%2F05%2F01&code=6223&response=json
+  response:
+    body:
+      string: "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body>\r\n<center><h1>301
+        Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+    headers:
+      CF-RAY:
+      - 9e9a74d859933207-MEM
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/html
+      Date:
+      - Thu, 09 Apr 2026 15:13:33 GMT
+      Location:
+      - https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2015%2F05%2F01&code=6223&response=json
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      cf-cache-status:
+      - DYNAMIC
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.33.0
+    method: GET
+    uri: https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2015%2F05%2F01&code=6223&response=json
+  response:
+    body:
+      string: "{\"tables\":[{\"title\":\"\u500B\u80A1\u65E5\u6210\u4EA4\u8CC7\u8A0A\",\"subtitle\":\"6223
+        \u65FA\u77FD 104\u5E7405\u6708\",\"date\":\"20150501\",\"data\":[[\"104/05/04\",\"374\",\"34,462\",\"93.00\",\"93.00\",\"91.30\",\"91.40\",\"-0.60\",\"323\"],[\"104/05/05\",\"474\",\"43,721\",\"91.50\",\"93.20\",\"91.20\",\"91.80\",\"0.40\",\"368\"],[\"104/05/06\",\"468\",\"42,967\",\"91.50\",\"93.20\",\"90.40\",\"91.80\",\"0.00\",\"401\"],[\"104/05/07\",\"1,257\",\"117,125\",\"91.80\",\"94.10\",\"91.80\",\"93.50\",\"1.70\",\"820\"],[\"104/05/08\",\"1,079\",\"99,439\",\"93.50\",\"93.90\",\"90.30\",\"91.00\",\"-2.50\",\"804\"],[\"104/05/11\",\"3,400\",\"294,740\",\"92.40\",\"92.80\",\"84.70\",\"84.70\",\"-6.30\",\"2,031\"],[\"104/05/12\",\"3,424\",\"280,856\",\"83.70\",\"84.80\",\"78.80\",\"84.00\",\"-0.70\",\"2,484\"],[\"104/05/13\",\"1,078\",\"91,625\",\"84.00\",\"86.40\",\"82.50\",\"85.80\",\"1.80\",\"808\"],[\"104/05/14\",\"1,433\",\"125,392\",\"88.70\",\"88.70\",\"86.50\",\"87.10\",\"1.30\",\"1,065\"],[\"104/05/15\",\"891\",\"76,478\",\"86.50\",\"86.60\",\"85.00\",\"86.10\",\"-1.00\",\"632\"],[\"104/05/18\",\"1,202\",\"100,938\",\"86.10\",\"86.10\",\"83.00\",\"83.90\",\"-2.20\",\"913\"],[\"104/05/19\",\"1,008\",\"85,342\",\"83.50\",\"85.50\",\"83.40\",\"84.50\",\"0.60\",\"850\"],[\"104/05/20\",\"999\",\"86,379\",\"85.30\",\"87.10\",\"84.70\",\"86.70\",\"2.20\",\"731\"],[\"104/05/21\",\"488\",\"42,151\",\"86.40\",\"86.90\",\"85.60\",\"86.30\",\"-0.40\",\"335\"],[\"104/05/22\",\"706\",\"60,965\",\"86.20\",\"87.40\",\"85.70\",\"86.00\",\"-0.30\",\"496\"],[\"104/05/25\",\"231\",\"19,948\",\"85.90\",\"86.90\",\"85.70\",\"86.20\",\"0.20\",\"179\"],[\"104/05/26\",\"1,890\",\"169,432\",\"87.00\",\"91.90\",\"86.30\",\"91.10\",\"4.90\",\"1,406\"],[\"104/05/27\",\"782\",\"70,881\",\"90.70\",\"91.60\",\"89.50\",\"90.90\",\"-0.20\",\"585\"],[\"104/05/28\",\"1,214\",\"112,992\",\"91.20\",\"94.40\",\"91.20\",\"91.70\",\"0.80\",\"870\"],[\"104/05/29\",\"583\",\"53,033\",\"92.00\",\"92.60\",\"90.40\",\"90.40\",\"-1.30\",\"415\"]],\"fields\":[\"\u65E5
+        \u671F\",\"\u6210\u4EA4\u4EDF\u80A1\",\"\u6210\u4EA4\u4EDF\u5143\",\"\u958B\u76E4\",\"\u6700\u9AD8\",\"\u6700\u4F4E\",\"\u6536\u76E4\",\"\u6F32\u8DCC\",\"\u7B46\u6578\"],\"notes\":[\"\u4EE5\u4E0A\u8CC7\u6599\u4E0D\u542B\u4E0A\u6AC3\u80A1\u7968\u9245\u984D\u4EA4\u6613\",\"ETF\u8B49\u5238\u4EE3\u865F\u7B2C\u516D\u78BC\u70BAK\u3001C\u8005\uFF0C\u8868\u793A\u8A72ETF\u4EE5\u5916\u5E63\u4EA4\u6613\uFF0C\u5176\u4E00\u4EA4\u6613\u55AE\u4F4D(\u5F35)\u61C9\u70BA100\u53D7\u76CA\u6B0A\u6216\u5176\u6574\u500D\u6578\uFF0C\u8ACB\u8A73\u5176\u516C\u958B\u8AAA\u660E\u66F8\u3002\"],\"totalCount\":20,\"summary\":[]}],\"date\":\"20150501\",\"code\":\"6223\",\"name\":\"\u65FA\u77FD\",\"showListPriceNote\":false,\"showListPriceLink\":false,\"flagField\":\"\u4EDF\u80A1\",\"stat\":\"ok\"}"
+    headers:
+      CF-RAY:
+      - 9e9a74db9d0c227f-MIA
+      Cache-Control:
+      - max-age=600, private, must-revalidate
+      - private
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'self' *.twse.com.tw *.tdcc.com.tw digitalprocesssys-epassbook.cdn.hinet.net
+        http://digitalprocesssyst-epassbook.cdn.hinet.net;
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 09 Apr 2026 15:13:34 GMT
+      Permissions-Policy:
+      - accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(),
+        microphone=(), payment=(), usb=()
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - JSESSIONID=DA61F75D3D3102DFCD0D560A9B755639; Path=/; SameSite=None; Secure;
+        HttpOnlywww; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31535000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-cache-status:
+      - DYNAMIC
+    status:
+      code: 200
+      message: OK
+version: 1

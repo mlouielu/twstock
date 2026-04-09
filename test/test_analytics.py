@@ -1,7 +1,10 @@
 import unittest
+import vcr
 from twstock import stock
 from twstock import analytics
 from twstock import legacy
+
+MY_VCR = vcr.VCR(cassette_library_dir="test/cassettes", record_mode="none")
 
 
 class AnalyticsTest(unittest.TestCase):
@@ -84,9 +87,9 @@ class AnalyticsTest(unittest.TestCase):
 
 class BestFourPointTest(unittest.TestCase):
     @classmethod
+    @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(self):
         self.stock = stock.Stock("2330")
-        self.stock.fetch(2015, 5)
         self.legacy = legacy.LegacyBestFourPoint(self.stock)
         self.ng = analytics.BestFourPoint(self.stock)
 
@@ -128,6 +131,7 @@ class BestFourPointTest(unittest.TestCase):
             self.ng.best_four_point_to_sell(), self.legacy.best_four_point_to_sell()
         )
 
+    @MY_VCR.use_cassette("twse_2330_historical.yaml")
     def test_best_four_point(self):
         self.stock.fetch(2014, 5)
         self.assertEqual(self.ng.best_four_point(), self.legacy.best_four_point())
