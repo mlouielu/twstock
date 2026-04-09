@@ -1,13 +1,10 @@
 name: publish
-on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "Tag to publish (e.g. v1.4.5)"
-        required: true
+
+"on":
+  push: {}
+  pull_request: {}
+  release:
+    types: [published]
 
 jobs:
   build_wheels:
@@ -46,9 +43,13 @@ jobs:
     name: Publish to PyPI
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    environment: pypi
+    environment:
+      name: pypi
+      url: https://pypi.org/p/twstock
     permissions:
       id-token: write
+    if: github.event_name == 'release' && github.event.action == 'published'
+
     steps:
       - uses: actions/download-artifact@v4
         with:
