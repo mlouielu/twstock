@@ -3,19 +3,60 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish (e.g. v1.4.5)"
+        required: true
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write  # required for PyPI trusted publishing (OIDC)
+  build_wheels:
+    name: Build wheels (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed for uv-dynamic-versioning to read tags
+          fetch-depth: 0
+      - uses: pypa/cibuildwheel@v2
+        env:
+          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
-      - name: Build
-        run: uv build
-      - name: Publish to PyPI
-        run: uv publish
+      - run: uv build --sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
