@@ -1,0 +1,21 @@
+name: publish
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # required for PyPI trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for uv-dynamic-versioning to read tags
+      - uses: astral-sh/setup-uv@v5
+      - name: Build
+        run: uv build
+      - name: Publish to PyPI
+        run: uv publish
