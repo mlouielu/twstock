@@ -1,6 +1,20 @@
 import abc
-
+import ssl
 from itertools import cycle
+
+import requests
+
+
+class _LegacyCertAdapter(requests.adapters.HTTPAdapter):
+    """Adapter for TWSE/TPEX servers whose certificates are missing the
+    Subject Key Identifier extension, rejected by Python 3.13+ VERIFY_X509_STRICT."""
+
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = ssl.create_default_context()
+        if hasattr(ssl, "VERIFY_X509_STRICT"):
+            ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
+        kwargs["ssl_context"] = ctx
+        return super().init_poolmanager(*args, **kwargs)
 
 
 class ProxyProvider(abc.ABC):
@@ -59,3 +73,10 @@ def configure_proxy_provider(provider_instance):
 
 def get_proxies():
     return _provider_instance.get_proxy()
+
+
+def get_session() -> requests.Session:
+    session = requests.Session()
+    session.mount("https://", _LegacyCertAdapter())
+    session.mount("http://", _LegacyCertAdapter())
+    return session
