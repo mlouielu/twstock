@@ -18,6 +18,7 @@ class MockTest(unittest.TestCase):
                 "rtcode",
                 "exKey",
                 "cachedAlive",
+                "note",
             ],
         )
 

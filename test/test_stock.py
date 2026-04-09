@@ -20,6 +20,7 @@ class FetcherTest(object):
             "196.50",
             "+2.00",
             "15,718",
+            "",
         ]
         dt = self.fetcher._make_datatuple(data)
         self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
@@ -43,6 +44,7 @@ class FetcherTest(object):
             "--",
             " 0.00",
             "15,718",
+            "",
         ]
         dt = self.fetcher._make_datatuple(data)
         self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
