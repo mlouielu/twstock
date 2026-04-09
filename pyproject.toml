@@ -36,6 +36,7 @@ twstock = "twstock.cli:run"
 
 [dependency-groups]
 dev = [
+    "coverage",
     "coveralls",
     "codecov",
     "wheel",
