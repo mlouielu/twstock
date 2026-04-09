@@ -39,5 +39,6 @@ dev = [
     "coverage",
     "coveralls",
     "codecov",
+    "vcrpy",
     "wheel",
 ]
