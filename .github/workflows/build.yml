@@ -4,37 +4,23 @@ on: [push, pull_request]
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # macos-15-intel is an Intel runner, macos-14 is Apple silicon
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-15-intel, macos-14]
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.1
-        env:
-          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: wheelhouse/*.whl
-  build_sdist:
-    name: Build sdist
+    name: Build wheels
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v5
-      - run: uv build --sdist
-      - uses: actions/upload-artifact@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build build artifacts
+        # This builds both the .whl (wheel) and .tar.gz (sdist)
+        run: uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: sdist
-          path: dist/*.tar.gz
+          name: wheels-sdist
+          # This will upload everything in the dist/ folder
+          path: dist/*
