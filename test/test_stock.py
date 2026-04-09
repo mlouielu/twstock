@@ -201,6 +201,10 @@ class TWSEStockTest(unittest.TestCase, StockTest):
     def setUpClass(cls):
         cls.stk = stock.Stock("2330")
 
+    @MY_VCR.use_cassette("twse_2330_recent.yaml")
+    def test_fetch_31(self):
+        super().test_fetch_31()
+
     @MY_VCR.use_cassette("twse_2330_2015_5.yaml")
     def test_price(self):
         self.stk.fetch(2015, 5)
@@ -271,6 +275,10 @@ class TPEXStockTest(unittest.TestCase, StockTest):
     @MY_VCR.use_cassette("tpex_6223_recent.yaml")
     def setUpClass(cls):
         cls.stk = stock.Stock("6223")
+
+    @MY_VCR.use_cassette("tpex_6223_recent.yaml")
+    def test_fetch_31(self):
+        super().test_fetch_31()
 
     @MY_VCR.use_cassette("tpex_6223_2015_5.yaml")
     def test_price(self):
