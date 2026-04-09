@@ -197,6 +197,7 @@ class TWSEStockTest(unittest.TestCase, StockTest):
     def setUpClass(cls):
         cls.stk = stock.Stock("2330")
 
+    @unittest.skip("Flaky: depends on live API availability for historical data")
     def test_price(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
@@ -228,6 +229,7 @@ class TWSEStockTest(unittest.TestCase, StockTest):
             ],
         )
 
+    @unittest.skip("Flaky: depends on live API availability for historical data")
     def test_capacity(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)
@@ -265,6 +267,7 @@ class TPEXStockTest(unittest.TestCase, StockTest):
     def setUpClass(cls):
         cls.stk = stock.Stock("6223")
 
+    @unittest.skip("Flaky: depends on live API availability for historical data")
     def test_price(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.price, list)
@@ -296,6 +299,7 @@ class TPEXStockTest(unittest.TestCase, StockTest):
             ],
         )
 
+    @unittest.skip("Flaky: depends on live API availability for historical data")
     def test_capacity(self):
         self.stk.fetch(2015, 5)
         self.assertIsInstance(self.stk.capacity, list)
