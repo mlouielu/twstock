@@ -148,7 +148,7 @@ class TPEXFetcher(BaseFetcher):
 
     def _make_datatuple(self, data):
         data[0] = datetime.datetime.strptime(
-            self._convert_date(data[0].replace("*", "")), "%Y/%m/%d"
+            self._convert_date(data[0].replace("*", "").replace("＊", "")), "%Y/%m/%d"
         )
         data[1] = int(data[1].replace(",", "")) * 1000
         data[2] = int(data[2].replace(",", "")) * 1000

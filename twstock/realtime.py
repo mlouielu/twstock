@@ -116,6 +116,12 @@ def get(stocks, retry=3):
         data["rtcode"] = "5001"
         return data
 
+    # Check if the response contains valid stock data
+    if "tlong" not in data["msgArray"][0]:
+        data["rtmessage"] = "Invalid Stock ID."
+        data["rtcode"] = "5002"
+        return data
+
     # Return multiple stock data
     if isinstance(stocks, list):
         result = {
