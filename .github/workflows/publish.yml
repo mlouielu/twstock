@@ -1,13 +1,15 @@
 name: publish
 
+
 "on":
+  push: {}
+  pull_request: {}
   release:
     types: [published]
 
 jobs:
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -17,13 +19,9 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v3
         with:
-          pattern: wheels-*
-          merge-multiple: true
-          path: dist/
-      - uses: actions/download-artifact@v4
-        with:
-          name: sdist
-          path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+          fetch-depth: 0 # full history for setuptools_scm
+
+      - name: Build and publish
+        uses: lsst-sqre/build-and-publish-to-pypi@v3
