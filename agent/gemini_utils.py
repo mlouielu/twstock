@@ -31,7 +31,8 @@ def get_gemini_insight(token, stock_code, stock_name, price, signals):
     }
     
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        # 增加 timeout 到 30 秒，避免 Gemini API 回應較慢時發生 Read timed out
+        response = requests.post(url, json=payload, timeout=30)
         data = response.json()
         
         if "candidates" in data and len(data["candidates"]) > 0:
