@@ -45,6 +45,14 @@ class StrategyEngine:
         signal = get_macd_signal(self.stock.price)
         return signal
 
+    def run_rsi_kd_strategy(self):
+        """RSI 與 KD 指標策略"""
+        from tech_indicators import get_rsi_kd_signals
+        if len(self.stock.price) < 15:
+            return []
+        signals = get_rsi_kd_signals(self.stock.price, self.stock.high, self.stock.low)
+        return signals
+
     def run_financial_analyst_scenario(self):
         """財務分析師：風險與報酬情境分析 (Risk-Reward Scenario)"""
         if len(self.stock.price) < 20:
@@ -101,7 +109,12 @@ class StrategyEngine:
         if msg_macd:
             messages.append(msg_macd)
             
-        # 策略 3: 財務分析師 - 情境與風報比分析
+        # 策略 3: RSI 與 KD 指標
+        msgs_rsikd = self.run_rsi_kd_strategy()
+        if msgs_rsikd:
+            messages.extend(msgs_rsikd)
+            
+        # 策略 4: 財務分析師 - 情境與風報比分析
         msg_fa = self.run_financial_analyst_scenario()
         if msg_fa:
             messages.append(msg_fa)
