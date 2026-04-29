@@ -110,3 +110,5 @@ ENV/
 agent/report_*.md
 agent/*.log
 nohup.out
+agent/twstock_cache.db-shm
+.gitignore
