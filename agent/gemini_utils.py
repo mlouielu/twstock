@@ -13,21 +13,22 @@ def get_gemini_insight(token, stock_code, stock_name, price, signals):
     # 組合給 Gemini 的 Prompt
     signals_text = "\n    - ".join(signals)
     prompt = f"""
-    你現在是一位專業的台股量化交易分析師。
-    我有一個自動化交易代理人，它剛剛針對以下股票產生了量化訊號。
-    請根據這些訊號，用「一句話（嚴格限制在 30 個字以內）」給出明天開盤的操作建議或風險提示。
-    語氣要果斷、冷靜、一針見血，不要任何廢話。
+    你現在是一位專業的台股量化與基本面分析師。
+    請使用搜尋工具，查詢這檔股票「{stock_name}」近三天的最新重大新聞或法說會消息。
+    結合以下代理人給出的技術面量化訊號，以及你搜尋到的最新時事，用「兩句話（嚴格限制在 50 個字以內）」給出明天開盤的操作建議或風險提示。
+    語氣要果斷、冷靜，如果新聞面與技術面有矛盾請直接點出。
 
     【標的資訊】
     股票：{stock_code} {stock_name}
     今日收盤價：{price}
 
-    【代理人觸發的訊號】
+    【代理人觸發的技術面訊號】
     - {signals_text}
     """
     
     payload = {
-        "contents": [{"parts": [{"text": prompt}]}]
+        "contents": [{"parts": [{"text": prompt}]}],
+        "tools": [{"googleSearch": {}}]
     }
     
     try:

@@ -32,24 +32,42 @@ def send_telegram_message(token, chat_id, text):
         return False
         
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
     
-    try:
-        response = requests.post(url, json=payload, timeout=10)
-        if response.status_code == 200:
-            logging.info("✅ Telegram 報表推播成功！")
-            return True
+    # Telegram 每個訊息限制 4096 字元，我們設定 4000 作為安全上限
+    chunks = []
+    current_chunk = ""
+    for line in text.split('\n'):
+        # 考慮加上 '\n' 的長度
+        if len(current_chunk) + len(line) + 1 > 4000:
+            chunks.append(current_chunk)
+            current_chunk = line + "\n"
         else:
-            logging.error(f"Telegram 推播失敗，狀態碼: {response.status_code}, 回應: {response.text}")
-            return False
-    except Exception as e:
-        logging.error(f"傳送 Telegram 訊息發生例外錯誤: {e}")
-        return False
+            current_chunk += line + "\n"
+    if current_chunk:
+        chunks.append(current_chunk)
+        
+    all_success = True
+    for chunk in chunks:
+        payload = {
+            "chat_id": chat_id,
+            "text": chunk,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True
+        }
+        
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            if response.status_code != 200:
+                logging.error(f"Telegram 推播失敗，狀態碼: {response.status_code}, 回應: {response.text}")
+                all_success = False
+        except Exception as e:
+            logging.error(f"傳送 Telegram 訊息發生例外錯誤: {e}")
+            all_success = False
+            
+    if all_success:
+        logging.info("✅ Telegram 報表推播成功！")
+        return True
+    return False
 
 if __name__ == "__main__":
     # 測試腳本：用來幫助使用者找出 Chat ID
