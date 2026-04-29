@@ -209,6 +209,10 @@ def main():
     
     report_data = []
     
+    # 載入目前的虛擬持倉
+    from db_utils import get_open_positions, record_buy, record_sell
+    open_positions = get_open_positions()
+    
     for idx, code in enumerate(watchlist):
         logging.info(f"正在抓取並分析 {code} ({idx+1}/{len(watchlist)})...")
         try:
@@ -227,6 +231,23 @@ def main():
             # 丟入策略引擎計算
             engine = StrategyEngine(stock)
             signals = engine.run_all()
+            
+            # 績效追蹤模組邏輯
+            if latest_price != "N/A" and stock.date:
+                today_date = stock.date[-1]
+                has_buy = any("🟢 買進" in s for s in signals)
+                has_sell = any("🔴 賣出" in s for s in signals)
+                
+                if code in open_positions:
+                    if has_sell:
+                        record_sell(code, today_date, latest_price)
+                        signals.append(f"✅ [虛擬平倉] 以 {latest_price} 賣出")
+                        del open_positions[code]
+                else:
+                    if has_buy and not has_sell:
+                        record_buy(code, today_date, latest_price)
+                        signals.append(f"✅ [虛擬建倉] 以 {latest_price} 買進")
+                        open_positions[code] = {"buy_price": latest_price}
             
             # 🤖 Gemini AI 分析
             # 注意：使用者設定的環境變數可能包含全形字母，我們用通用的 GEMINI_API_TOKEN 或全形版本
@@ -254,6 +275,22 @@ def main():
         
     report_md = generate_markdown_report(report_data)
     
+    # 附加虛擬投資組合狀態 (Markdown)
+    portfolio_text = "\n### 💼 虛擬投資組合狀態\n"
+    if not open_positions:
+        portfolio_text += "目前無持倉。\n"
+    else:
+        portfolio_text += "| 股票代號 | 買進價格 | 目前價格 | 未實現損益 |\n| -------- | -------- | -------- | ---------- |\n"
+        for p_code, p_data in open_positions.items():
+            p_price = p_data["buy_price"]
+            curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
+            if curr_price != "N/A":
+                roi = (curr_price - p_price) / p_price * 100
+                portfolio_text += f"| {p_code} | {p_price:.2f} | {curr_price:.2f} | {roi:+.2f}% |\n"
+            else:
+                portfolio_text += f"| {p_code} | {p_price:.2f} | N/A | N/A |\n"
+    report_md = report_md.replace("---\n*💡", portfolio_text + "\n---\n*💡")
+    
     # 儲存報告
     report_filename = f"report_{datetime.now().strftime('%Y%m%d')}.md"
     report_filepath = os.path.join(os.path.dirname(__file__), report_filename)
@@ -274,6 +311,22 @@ def main():
     if bot_token and chat_id:
         logging.info("準備發送 Telegram 推播...")
         report_tg = generate_telegram_report(report_data)
+        
+        # 附加虛擬投資組合狀態 (Telegram HTML)
+        portfolio_tg = "\n💼 <b>虛擬投資組合狀態</b>\n"
+        if not open_positions:
+            portfolio_tg += "目前無持倉。\n"
+        else:
+            for p_code, p_data in open_positions.items():
+                p_price = p_data["buy_price"]
+                curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
+                if curr_price != "N/A":
+                    roi = (curr_price - p_price) / p_price * 100
+                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ {curr_price:.2f} (<b>{roi:+.2f}%</b>)\n"
+                else:
+                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ N/A\n"
+        report_tg = report_tg.replace("💡 <i>", portfolio_tg + "\n💡 <i>")
+        
         send_telegram_message(bot_token, chat_id, report_tg)
     elif bot_token and not chat_id:
         logging.warning("⚠️ 有偵測到 TELEGRAM_BOT_TOKEN，但 config.json 中沒有 telegram_chat_id。")

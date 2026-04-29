@@ -26,7 +26,60 @@ def init_db():
             PRIMARY KEY (code, date)
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS portfolio (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT,
+            buy_date TIMESTAMP,
+            buy_price REAL,
+            sell_date TIMESTAMP,
+            sell_price REAL,
+            status TEXT,
+            profit_pct REAL
+        )
+    ''')
     conn.commit()
+    conn.close()
+
+def get_open_positions():
+    init_db()
+    conn = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
+    cursor = conn.cursor()
+    cursor.execute("SELECT code, buy_date, buy_price FROM portfolio WHERE status = 'OPEN'")
+    rows = cursor.fetchall()
+    conn.close()
+    result = {}
+    for row in rows:
+        dt = row[1]
+        if isinstance(dt, str):
+            dt = datetime.strptime(dt.split('.')[0], "%Y-%m-%d %H:%M:%S")
+        result[row[0]] = {"buy_date": dt, "buy_price": row[2]}
+    return result
+
+def record_buy(code, buy_date, buy_price):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO portfolio (code, buy_date, buy_price, status)
+        VALUES (?, ?, ?, 'OPEN')
+    ''', (code, buy_date, buy_price))
+    conn.commit()
+    conn.close()
+
+def record_sell(code, sell_date, sell_price):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, buy_price FROM portfolio WHERE code = ? AND status = 'OPEN' ORDER BY id DESC LIMIT 1", (code,))
+    row = cursor.fetchone()
+    if row:
+        record_id, buy_price = row
+        profit_pct = (sell_price - buy_price) / buy_price * 100
+        cursor.execute('''
+            UPDATE portfolio 
+            SET sell_date = ?, sell_price = ?, status = 'CLOSED', profit_pct = ?
+            WHERE id = ?
+        ''', (sell_date, sell_price, profit_pct, record_id))
+        conn.commit()
     conn.close()
 
 def save_to_db(code, data_list):

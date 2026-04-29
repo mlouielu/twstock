@@ -1,0 +1,14 @@
+2026-04-29 16:04:31,554 - INFO - 🤖 台股智能助理 (Telegram Bot Daemon) 已啟動，等待指令中...
+2026-04-29 16:04:38,165 - ERROR - 網路連線錯誤: 409 Client Error: Conflict for url: https://api.telegram.org/bot8277171927:AAGJJpPJnaZmsEoV3kdMpXfmtCLdLQG8N2Q/getUpdates?timeout=30&allowed_updates=message
+2026-04-29 16:05:21,049 - INFO - 收到指令: /analyze 00650
+2026-04-29 16:05:22,839 - INFO - ✅ Telegram 報表推播成功！
+2026-04-29 16:05:22,840 - ERROR - 分析失敗: 'Stock ID "00650" not found in database.
+Either you misspelled it or it is not in the database.
+If you believe your stock ID is correct, please update stock codes database using:
+  - CLI: twstock -U
+  - Python: python -c "import twstock; twstock.__update_codes()"'
+2026-04-29 16:05:23,845 - INFO - ✅ Telegram 報表推播成功！
+2026-04-29 16:05:47,015 - INFO - 收到指令: /analyze 0056
+2026-04-29 16:05:48,114 - INFO - ✅ Telegram 報表推播成功！
+2026-04-29 16:05:48,115 - INFO - [資料庫] 從 TWSE 同步 0056 (2026/04) 的資料...
+2026-04-29 16:06:08,101 - INFO - ✅ Telegram 報表推播成功！
