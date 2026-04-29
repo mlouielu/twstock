@@ -8,8 +8,15 @@ from twstock.stock import DATATUPLE as Data
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'twstock_cache.db')
 
+def _connect():
+    """統一建立資料庫連線，啟用 WAL 模式與 10 秒等鎖逾時"""
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    return conn
+
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = _connect()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS daily_prices (
@@ -38,14 +45,19 @@ def init_db():
             profit_pct REAL
         )
     ''')
+    try:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN buy_shares INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
     conn.commit()
     conn.close()
 
 def get_open_positions():
     init_db()
-    conn = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = sqlite3.connect(DB_PATH, timeout=10, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn.execute("PRAGMA journal_mode=WAL")
     cursor = conn.cursor()
-    cursor.execute("SELECT code, buy_date, buy_price FROM portfolio WHERE status = 'OPEN'")
+    cursor.execute("SELECT code, buy_date, buy_price, buy_shares FROM portfolio WHERE status = 'OPEN'")
     rows = cursor.fetchall()
     conn.close()
     result = {}
@@ -53,21 +65,21 @@ def get_open_positions():
         dt = row[1]
         if isinstance(dt, str):
             dt = datetime.strptime(dt.split('.')[0], "%Y-%m-%d %H:%M:%S")
-        result[row[0]] = {"buy_date": dt, "buy_price": row[2]}
+        result[row[0]] = {"buy_date": dt, "buy_price": row[2], "buy_shares": row[3]}
     return result
 
-def record_buy(code, buy_date, buy_price):
-    conn = sqlite3.connect(DB_PATH)
+def record_buy(code, buy_date, buy_price, buy_shares):
+    conn = _connect()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO portfolio (code, buy_date, buy_price, status)
-        VALUES (?, ?, ?, 'OPEN')
-    ''', (code, buy_date, buy_price))
+        INSERT INTO portfolio (code, buy_date, buy_price, buy_shares, status)
+        VALUES (?, ?, ?, ?, 'OPEN')
+    ''', (code, buy_date, buy_price, buy_shares))
     conn.commit()
     conn.close()
 
 def record_sell(code, sell_date, sell_price):
-    conn = sqlite3.connect(DB_PATH)
+    conn = _connect()
     cursor = conn.cursor()
     cursor.execute("SELECT id, buy_price FROM portfolio WHERE code = ? AND status = 'OPEN' ORDER BY id DESC LIMIT 1", (code,))
     row = cursor.fetchone()
@@ -85,7 +97,7 @@ def record_sell(code, sell_date, sell_price):
 def save_to_db(code, data_list):
     if not data_list:
         return
-    conn = sqlite3.connect(DB_PATH)
+    conn = _connect()
     cursor = conn.cursor()
     
     records = []
@@ -114,7 +126,8 @@ def save_to_db(code, data_list):
     conn.close()
 
 def get_from_db(code, start_date):
-    conn = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = sqlite3.connect(DB_PATH, timeout=10, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn.execute("PRAGMA journal_mode=WAL")
     cursor = conn.cursor()
     cursor.execute('''
         SELECT date, capacity, turnover, open, high, low, close, change, transaction_count
@@ -157,19 +170,27 @@ def get_cached_stock(code, start_year, start_month):
     # 建立空的 Stock 物件
     stock = twstock.Stock(code, initial_fetch=False)
     
-    local_data = get_from_db(code, start_date)
-    last_local_date = local_data[-1].date if local_data else None
-    
     today = datetime.now()
+    
+    # 檢查哪些月份在資料庫中是缺少的
     months_to_fetch = []
+    conn = _connect()
+    cursor = conn.cursor()
     
     for y, m in stock._month_year_iter(start_month, start_year, today.month, today.year):
-        if last_local_date:
-            # 已經抓取過且大於最後本地月份的才需要呼叫 API
-            # 確保不會遺漏同一月份後半段新增的日期，所以如果是當前最新月份，依然會嘗試抓取 (INSERT IGNORE)
-            if y < last_local_date.year or (y == last_local_date.year and m < last_local_date.month):
-                continue
-        months_to_fetch.append((y, m))
+        is_current_month = (y == today.year and m == today.month)
+        
+        # 檢查該月份在資料庫中是否有任何一天的資料
+        cursor.execute('''
+            SELECT 1 FROM daily_prices 
+            WHERE code = ? AND strftime('%Y', date) = ? AND strftime('%m', date) = ?
+            LIMIT 1
+        ''', (code, str(y), f"{m:02d}"))
+        
+        if is_current_month or not cursor.fetchone():
+            months_to_fetch.append((y, m))
+            
+    conn.close()
         
     new_data = []
     for y, m in months_to_fetch:

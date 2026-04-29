@@ -241,13 +241,31 @@ def main():
                 if code in open_positions:
                     if has_sell:
                         record_sell(code, today_date, latest_price)
-                        signals.append(f"✅ [虛擬平倉] 以 {latest_price} 賣出")
+                        p_shares = open_positions[code].get("buy_shares", 0)
+                        profit = (latest_price - open_positions[code]["buy_price"]) * p_shares * 0.995
+                        signals.append(f"✅ [虛擬平倉] 以 {latest_price} 賣出 (預估獲利: {profit:.0f} 元)")
                         del open_positions[code]
                 else:
                     if has_buy and not has_sell:
-                        record_buy(code, today_date, latest_price)
-                        signals.append(f"✅ [虛擬建倉] 以 {latest_price} 買進")
-                        open_positions[code] = {"buy_price": latest_price}
+                        # 資金與部位控管 (Position Sizing)
+                        total_capital = config.get("total_capital", 1000000)
+                        risk_pct = config.get("risk_per_trade_pct", 1.0) / 100.0
+                        risk_amount = total_capital * risk_pct
+                        
+                        from tech_indicators import calculate_atr
+                        atr = calculate_atr(stock.price, stock.high, stock.low, period=14)
+                        if atr:
+                            sl_dist = 1.5 * atr
+                        else:
+                            sl_dist = latest_price * 0.10
+                            
+                        buy_shares = int(risk_amount / sl_dist) if sl_dist > 0 else 0
+                        max_shares = int(total_capital / latest_price)
+                        buy_shares = min(buy_shares, max_shares)
+                        
+                        record_buy(code, today_date, latest_price, buy_shares)
+                        signals.append(f"✅ [虛擬建倉] 以 {latest_price} 買進 (建議: {buy_shares} 股)")
+                        open_positions[code] = {"buy_price": latest_price, "buy_shares": buy_shares}
             
             # 🤖 Gemini AI 分析
             # 注意：使用者設定的環境變數可能包含全形字母，我們用通用的 GEMINI_API_TOKEN 或全形版本
@@ -280,15 +298,17 @@ def main():
     if not open_positions:
         portfolio_text += "目前無持倉。\n"
     else:
-        portfolio_text += "| 股票代號 | 買進價格 | 目前價格 | 未實現損益 |\n| -------- | -------- | -------- | ---------- |\n"
+        portfolio_text += "| 股票代號 | 買進價格 | 目前價格 | 持有股數 | 未實現損益 |\n| -------- | -------- | -------- | -------- | ---------- |\n"
         for p_code, p_data in open_positions.items():
             p_price = p_data["buy_price"]
+            p_shares = p_data.get("buy_shares", 0)
             curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
             if curr_price != "N/A":
                 roi = (curr_price - p_price) / p_price * 100
-                portfolio_text += f"| {p_code} | {p_price:.2f} | {curr_price:.2f} | {roi:+.2f}% |\n"
+                profit_amt = (curr_price - p_price) * p_shares
+                portfolio_text += f"| {p_code} | {p_price:.2f} | {curr_price:.2f} | {p_shares} | {roi:+.2f}% ({profit_amt:+.0f}元) |\n"
             else:
-                portfolio_text += f"| {p_code} | {p_price:.2f} | N/A | N/A |\n"
+                portfolio_text += f"| {p_code} | {p_price:.2f} | N/A | {p_shares} | N/A |\n"
     report_md = report_md.replace("---\n*💡", portfolio_text + "\n---\n*💡")
     
     # 儲存報告
@@ -319,10 +339,12 @@ def main():
         else:
             for p_code, p_data in open_positions.items():
                 p_price = p_data["buy_price"]
+                p_shares = p_data.get("buy_shares", 0)
                 curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
                 if curr_price != "N/A":
                     roi = (curr_price - p_price) / p_price * 100
-                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ {curr_price:.2f} (<b>{roi:+.2f}%</b>)\n"
+                    profit_amt = (curr_price - p_price) * p_shares
+                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ {curr_price:.2f} ({p_shares}股, <b>{roi:+.2f}%</b>, {profit_amt:+.0f}元)\n"
                 else:
                     portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ N/A\n"
         report_tg = report_tg.replace("💡 <i>", portfolio_tg + "\n💡 <i>")

@@ -51,10 +51,15 @@ def run_backtest(code, months=12):
         
     holding = False
     buy_price = 0
+    buy_shares = 0
     buy_date = None
     trades = []
     highest_price_since_buy = 0
     initial_stop_loss_price = 0
+    
+    # 部位控管設定
+    total_capital = 1000000
+    risk_pct = 0.01
     
     # 從第 60 天開始回測 (讓 MACD 和長均線有足夠數據)
     for i in range(60, total_days + 1):
@@ -90,17 +95,23 @@ def run_backtest(code, months=12):
                 else:
                     reason = "技術面賣出"
                     
-                profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5  # 扣除 0.5% 交易摩擦成本
+                profit_per_share = current_price - buy_price
+                trade_profit = profit_per_share * buy_shares * 0.995 # 扣除 0.5% 交易摩擦成本
+                profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5
+                total_capital += trade_profit
+                
                 trades.append({
                     "buy_date": buy_date,
                     "buy_price": buy_price,
+                    "buy_shares": buy_shares,
                     "sell_date": current_date,
                     "sell_price": current_price,
                     "profit_pct": profit_pct,
+                    "profit_amount": trade_profit,
                     "reason": reason
                 })
                 holding = False
-                logging.info(f"[{current_date}] 賣出 {code} @ {current_price} (獲利: {profit_pct:.2f}%) - {reason}")
+                logging.info(f"[{current_date}] 賣出 {code} @ {current_price} (獲利金額: {trade_profit:.0f} 元, {profit_pct:.2f}%) - {reason}")
                 
         else:
             ma20 = sum(mock_stock.price[-20:]) / 20
@@ -112,30 +123,43 @@ def run_backtest(code, months=12):
                 buy_date = current_date
                 highest_price_since_buy = current_price
                 
-                # 取得 ATR 以設定動態停損
+                # 取得 ATR 以設定動態停損與部位控管
                 from tech_indicators import calculate_atr
                 atr = calculate_atr(mock_stock.price, mock_stock.high, mock_stock.low, period=14)
                 if atr:
                     initial_stop_loss_price = buy_price - 1.5 * atr
+                    sl_dist = 1.5 * atr
                 else:
                     initial_stop_loss_price = buy_price * 0.90 # 降級保護
+                    sl_dist = buy_price * 0.10
                     
-                logging.info(f"[{current_date}] 買進 {code} @ {current_price} (停損設於 {initial_stop_loss_price:.1f})")
+                risk_amount = total_capital * risk_pct
+                buy_shares = int(risk_amount / sl_dist) if sl_dist > 0 else 0
+                max_shares = int(total_capital / current_price)
+                buy_shares = min(buy_shares, max_shares)
+                    
+                logging.info(f"[{current_date}] 買進 {code} @ {current_price} (數量: {buy_shares} 股, 停損設於 {initial_stop_loss_price:.1f})")
                 
     # 迴圈結束，如果手上還有持股，強制平倉結算
     if holding:
         current_date = stock.date[-1].strftime("%Y-%m-%d")
         current_price = stock.price[-1]
-        profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5  # 扣除 0.5% 交易摩擦成本
+        profit_per_share = current_price - buy_price
+        trade_profit = profit_per_share * buy_shares * 0.995 # 扣除 0.5% 交易摩擦成本
+        profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5
+        total_capital += trade_profit
+        
         trades.append({
             "buy_date": buy_date,
             "buy_price": buy_price,
+            "buy_shares": buy_shares,
             "sell_date": current_date,
             "sell_price": current_price,
             "profit_pct": profit_pct,
+            "profit_amount": trade_profit,
             "reason": "回測結束強制平倉"
         })
-        logging.info(f"[{current_date}] 賣出 {code} @ {current_price} (獲利: {profit_pct:.2f}%) - 回測結束強制平倉")
+        logging.info(f"[{current_date}] 賣出 {code} @ {current_price} (獲利金額: {trade_profit:.0f} 元, {profit_pct:.2f}%) - 回測結束強制平倉")
 
     # 輸出統計結果
     wins = [t for t in trades if t["profit_pct"] > 0]
@@ -145,15 +169,16 @@ def run_backtest(code, months=12):
     print("\n" + "="*50)
     print(f"📊 {code} 歷史回測報告 ({months} 個月)")
     print(f"策略：多維共振 (MA20濾網+四大買賣點/MACD/RSI/KD) + 財務風報比過濾 + ATR停損 + MA10移動停利")
+    print(f"部位控管：起始資金 100 萬，單筆風險 {risk_pct*100}%")
     print("="*50)
     print(f"總交易次數: {len(trades)}")
     if trades:
         print(f"勝率: {win_rate:.1f}%")
-        print(f"累計報酬率: {total_profit:.2f}% (單利計算)")
+        print(f"期末總資產: {total_capital:.0f} 元 (總獲利: {total_capital - 1000000:.0f} 元)")
         print("="*50)
         for t in trades:
             status = "✅ 獲利" if t['profit_pct'] > 0 else "❌ 虧損"
-            print(f"{status} | 買: {t['buy_date']} ({t['buy_price']}) -> 賣: {t['sell_date']} ({t['sell_price']}) | 報酬: {t['profit_pct']:.2f}% | {t['reason']}")
+            print(f"{status} | 買: {t['buy_date']} ({t['buy_price']}x{t['buy_shares']}股) -> 賣: {t['sell_date']} ({t['sell_price']}) | 報酬: {t['profit_amount']:.0f} 元 ({t['profit_pct']:.2f}%) | {t['reason']}")
     else:
         print("這段期間內沒有觸發任何符合嚴格條件的交易。")
 

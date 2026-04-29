@@ -109,3 +109,4 @@ ENV/
 # Agent generated reports and logs
 agent/report_*.md
 agent/*.log
+nohup.out
