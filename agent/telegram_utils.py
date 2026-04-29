@@ -33,14 +33,21 @@ def send_telegram_message(token, chat_id, text):
         
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     
-    # Telegram 每個訊息限制 4096 字元，我們設定 4000 作為安全上限
+    # Telegram 每個訊息限制 4096 字元，但某些編碼可能會超過，改用更保守的 3000 字元上限
+    limit = 3000
     chunks = []
     current_chunk = ""
     for line in text.split('\n'):
-        # 考慮加上 '\n' 的長度
-        if len(current_chunk) + len(line) + 1 > 4000:
-            chunks.append(current_chunk)
-            current_chunk = line + "\n"
+        if len(current_chunk) + len(line) + 1 > limit:
+            if current_chunk:
+                chunks.append(current_chunk)
+            # 防禦性程式設計：如果單行就超過 limit，強制切斷
+            if len(line) > limit:
+                for i in range(0, len(line), limit):
+                    chunks.append(line[i:i+limit] + "\n")
+                current_chunk = ""
+            else:
+                current_chunk = line + "\n"
         else:
             current_chunk += line + "\n"
     if current_chunk:

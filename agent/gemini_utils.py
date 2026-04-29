@@ -31,20 +31,48 @@ def get_gemini_insight(token, stock_code, stock_name, price, signals):
         "tools": [{"googleSearch": {}}]
     }
     
-    try:
-        # 增加 timeout 到 30 秒，避免 Gemini API 回應較慢時發生 Read timed out
-        response = requests.post(url, json=payload, timeout=30)
-        data = response.json()
-        
-        if "candidates" in data and len(data["candidates"]) > 0:
-            insight = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            # 移除 Markdown 標籤以配合 Telegram 顯示
-            insight = insight.replace('**', '').replace('*', '')
-            return insight
-        else:
-            logging.error(f"Gemini API 錯誤或無回傳內容: {data}")
-            return "AI 分析暫時無法使用"
+    import time
+    max_retries = 3
+    base_delay = 2
+    
+    for attempt in range(1, max_retries + 1):
+        try:
+            # 增加 timeout 到 45 秒，並加入指數退避重試機制
+            response = requests.post(url, json=payload, timeout=45)
             
-    except Exception as e:
-        logging.error(f"呼叫 Gemini API 發生錯誤: {e}")
-        return "AI 分析連線失敗"
+            # 處理 429 Rate Limit
+            if response.status_code == 429:
+                delay = base_delay * (2 ** (attempt - 1))
+                logging.warning(f"Gemini API 觸發 Rate Limit (429)，等待 {delay} 秒後重試...")
+                time.sleep(delay)
+                continue
+                
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if "candidates" in data and len(data["candidates"]) > 0:
+                insight = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                # 移除 Markdown 標籤以配合 Telegram 顯示
+                insight = insight.replace('**', '').replace('*', '')
+                return insight
+            else:
+                logging.error(f"Gemini API 錯誤或無回傳內容: {data}")
+                return "AI 分析暫時無法使用"
+                
+        except requests.exceptions.Timeout:
+            logging.error(f"呼叫 Gemini API 發生超時錯誤 (第 {attempt}/{max_retries} 次)")
+            if attempt < max_retries:
+                delay = base_delay * (2 ** (attempt - 1))
+                time.sleep(delay)
+            else:
+                return "AI 分析連線失敗 (超時)"
+        except requests.exceptions.RequestException as e:
+            logging.error(f"呼叫 Gemini API 發生網路/請求錯誤: {e} (第 {attempt}/{max_retries} 次)")
+            if attempt < max_retries:
+                delay = base_delay * (2 ** (attempt - 1))
+                time.sleep(delay)
+            else:
+                return "AI 分析連線失敗"
+                
+    return "AI 分析連線失敗"

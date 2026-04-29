@@ -80,3 +80,26 @@ def get_rsi_kd_signals(prices, highs, lows):
             signals.append(f"[🔴 賣出 (Sell)] KD 於高檔 ({k:.1f}) 死亡交叉")
             
     return signals
+
+def calculate_atr(prices, highs, lows, period=14):
+    """計算真實波動幅度 (ATR, 14日)"""
+    if len(prices) < period + 1:
+        return None
+        
+    trs = []
+    # 計算每一天的 True Range
+    for i in range(1, len(prices)):
+        h = highs[i]
+        l = lows[i]
+        prev_c = prices[i-1]
+        tr = max(h - l, abs(h - prev_c), abs(l - prev_c))
+        trs.append(tr)
+        
+    # 第一筆 ATR 使用簡單平均
+    atr = sum(trs[:period]) / period
+    
+    # 後續使用平滑移動平均 (Wilder's Smoothing)
+    for i in range(period, len(trs)):
+        atr = (atr * (period - 1) + trs[i]) / period
+        
+    return atr

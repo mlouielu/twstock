@@ -31,24 +31,16 @@ class MockStock(twstock.analytics.Analytics):
 def run_backtest(code, months=12):
     logging.info(f"開始回測 {code}，抓取過去 {months} 個月的歷史資料...")
     
-    stock = twstock.Stock(code, initial_fetch=False)
     today = datetime.now()
-    
-    # 往回抓歷史資料
-    stock.raw_data = []
-    stock.data = []
-    
     start_month = today.month - months
     start_year = today.year
     while start_month <= 0:
         start_month += 12
         start_year -= 1
         
-    for y, m in stock._month_year_iter(start_month, start_year, today.month, today.year):
-        logging.info(f"抓取 {y}/{m:02d}...")
-        stock.raw_data.append(stock.fetcher.fetch(y, m, stock.sid))
-        stock.data.extend(stock.raw_data[-1]["data"])
-        time.sleep(3.0) # 嚴格遵守速率限制防 Ban
+    # 改用帶有資料庫快取的模組
+    from db_utils import get_cached_stock
+    stock = get_cached_stock(code, start_year, start_month)
         
     total_days = len(stock.price)
     logging.info(f"資料抓取完成，總交易日數: {total_days}")
@@ -61,6 +53,8 @@ def run_backtest(code, months=12):
     buy_price = 0
     buy_date = None
     trades = []
+    highest_price_since_buy = 0
+    initial_stop_loss_price = 0
     
     # 從第 60 天開始回測 (讓 MACD 和長均線有足夠數據)
     for i in range(60, total_days + 1):
@@ -78,12 +72,25 @@ def run_backtest(code, months=12):
         wait_signals = [msg for msg in signals if "建議觀望" in msg]
         
         if holding:
-            # 判斷是否賣出 (技術指標賣出 或 強制停損 10%)
-            stop_loss = (current_price - buy_price) / buy_price <= -0.10
+            if current_price > highest_price_since_buy:
+                highest_price_since_buy = current_price
+                
+            # 判斷是否觸發初始停損 (買入價 - 1.5 * ATR)
+            stop_loss_hit = current_price < initial_stop_loss_price
             
-            if sell_signals or stop_loss:
-                reason = "停損出場" if stop_loss else "技術面賣出"
-                profit_pct = (current_price - buy_price) / buy_price * 100
+            # 判斷是否觸發移動停利 (獲利狀態下，跌破 10 日均線出場)
+            ma10 = sum(mock_stock.price[-10:]) / 10
+            trailing_stop_hit = current_price < ma10 and current_price > buy_price
+            
+            if stop_loss_hit or trailing_stop_hit or sell_signals:
+                if stop_loss_hit:
+                    reason = "ATR 初始停損出場"
+                elif trailing_stop_hit:
+                    reason = "跌破 10 日線移動停利"
+                else:
+                    reason = "技術面賣出"
+                    
+                profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5  # 扣除 0.5% 交易摩擦成本
                 trades.append({
                     "buy_date": buy_date,
                     "buy_price": buy_price,
@@ -96,18 +103,30 @@ def run_backtest(code, months=12):
                 logging.info(f"[{current_date}] 賣出 {code} @ {current_price} (獲利: {profit_pct:.2f}%) - {reason}")
                 
         else:
-            # 判斷是否買進 (有買進訊號 且 財務分析師沒有要求觀望)
-            if buy_signals and not wait_signals:
+            ma20 = sum(mock_stock.price[-20:]) / 20
+            
+            # 判斷是否買進 (有多頭排列 MA20之上 + 買進訊號 + 無風險過濾)
+            if buy_signals and current_price > ma20 and not wait_signals:
                 holding = True
                 buy_price = current_price
                 buy_date = current_date
-                logging.info(f"[{current_date}] 買進 {code} @ {current_price}")
+                highest_price_since_buy = current_price
+                
+                # 取得 ATR 以設定動態停損
+                from tech_indicators import calculate_atr
+                atr = calculate_atr(mock_stock.price, mock_stock.high, mock_stock.low, period=14)
+                if atr:
+                    initial_stop_loss_price = buy_price - 1.5 * atr
+                else:
+                    initial_stop_loss_price = buy_price * 0.90 # 降級保護
+                    
+                logging.info(f"[{current_date}] 買進 {code} @ {current_price} (停損設於 {initial_stop_loss_price:.1f})")
                 
     # 迴圈結束，如果手上還有持股，強制平倉結算
     if holding:
         current_date = stock.date[-1].strftime("%Y-%m-%d")
         current_price = stock.price[-1]
-        profit_pct = (current_price - buy_price) / buy_price * 100
+        profit_pct = (current_price - buy_price) / buy_price * 100 - 0.5  # 扣除 0.5% 交易摩擦成本
         trades.append({
             "buy_date": buy_date,
             "buy_price": buy_price,
@@ -125,7 +144,7 @@ def run_backtest(code, months=12):
     
     print("\n" + "="*50)
     print(f"📊 {code} 歷史回測報告 ({months} 個月)")
-    print(f"策略：四大買賣點 + MACD + RSI + KD + 財務風報比過濾 + 10%停損")
+    print(f"策略：多維共振 (MA20濾網+四大買賣點/MACD/RSI/KD) + 財務風報比過濾 + ATR停損 + MA10移動停利")
     print("="*50)
     print(f"總交易次數: {len(trades)}")
     if trades:

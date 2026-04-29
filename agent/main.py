@@ -212,10 +212,11 @@ def main():
     for idx, code in enumerate(watchlist):
         logging.info(f"正在抓取並分析 {code} ({idx+1}/{len(watchlist)})...")
         try:
-            # 為了讓 MACD 有足夠的資料(>35天)，我們手動拉取近 60 天的資料，不使用預設的截斷邏輯
-            stock = twstock.Stock(code, initial_fetch=False)
+            # 為了讓 MACD 有足夠的資料(>35天)，拉取近 60 天的資料
+            # 整合 SQLite 快取，避免每次執行都重新下載
+            from db_utils import get_cached_stock
             before = datetime.now() - timedelta(days=60)
-            stock.fetch_from(before.year, before.month)
+            stock = get_cached_stock(code, before.year, before.month)
             
             # 從 twstock 內建字典抓取股票名稱
             stock_info = twstock.codes.get(code)
@@ -247,9 +248,9 @@ def main():
         except Exception as e:
             logging.error(f"分析 {code} 時發生錯誤: {e}")
             
-        # ⚠️ 這是最重要的安全防護: TWSE API 限制每 5 秒 3 個請求。
-        # 由於為了 MACD 我們抓了近 60 天(約3個請求)，這裡強制休息 5 秒，確保絕對不會被 Ban。
-        time.sleep(5.0)
+        # 由於我們已經導入本地資料庫快取，只有在月初或剛新增標的時才會產生多次網路請求。
+        # db_utils 內部已處理了 3 秒的抓取間隔，這裡僅做 1 秒的短暫保護。
+        time.sleep(1.0)
         
     report_md = generate_markdown_report(report_data)
     
