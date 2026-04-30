@@ -28,6 +28,68 @@ class MockStock(twstock.analytics.Analytics):
         self.change = full_stock.change[:end_idx]
         self.transaction = full_stock.transaction[:end_idx]
 
+def trend_health_check(stock):
+    """
+    回測前置：趨勢健康度分析。
+    分析整體資料期間的價格趨勢，評估股票是否處於適合操作的多頭環境。
+    """
+    prices = stock.price
+    n = len(prices)
+    if n < 60:
+        return None
+
+    # 1. 季線 (MA60) 趨勢：目前股價是否在季線之上？
+    ma60_now = sum(prices[-60:]) / 60
+    price_now = prices[-1]
+    price_vs_ma60 = (price_now - ma60_now) / ma60_now * 100
+
+    # 2. 季線斜率：用前 60 天 vs 後 60 天均價判斷趨勢方向
+    half = n // 2
+    early_avg = sum(prices[:half]) / half
+    late_avg = sum(prices[half:]) / (n - half)
+    trend_slope_pct = (late_avg - early_avg) / early_avg * 100
+
+    # 3. 最大回撤 (Max Drawdown)
+    peak = prices[0]
+    max_dd = 0.0
+    for p in prices:
+        if p > peak:
+            peak = p
+        dd = (peak - p) / peak * 100
+        if dd > max_dd:
+            max_dd = dd
+
+    # 4. 綜合評分
+    score = 0
+    if price_now > ma60_now:
+        score += 40  # 站上季線
+    if trend_slope_pct > 0:
+        score += 30  # 整體趨勢向上
+    if max_dd < 15:
+        score += 20  # 最大回撤可控
+    if price_vs_ma60 > 5:
+        score += 10  # 明顯站穩季線之上
+
+    if score >= 70:
+        verdict = "🟢 趨勢健康 - 適合進行動能策略操作"
+    elif score >= 40:
+        verdict = "🟡 趨勢中性 - 建議降低部位，謹慎操作"
+    else:
+        verdict = "🔴 趨勢警示 - 長期空頭格局，高機率產生假訊號，建議觀望"
+
+    print("\n" + "="*50)
+    print(f"🩺 趨勢健康度預警報告")
+    print("="*50)
+    print(f"  目前股價 vs 季線 (MA60): {price_now:.2f} vs {ma60_now:.2f}  ({price_vs_ma60:+.1f}%)")
+    print(f"  整體趨勢斜率 (前後半期均價): {trend_slope_pct:+.2f}%")
+    print(f"  期間最大回撤: -{max_dd:.1f}%")
+    print(f"  健康評分: {score}/100")
+    print(f"  ➡️  {verdict}")
+    print("="*50)
+    
+    return score
+
+
 def run_backtest(code, months=12):
     logging.info(f"開始回測 {code}，抓取過去 {months} 個月的歷史資料...")
     
@@ -48,6 +110,12 @@ def run_backtest(code, months=12):
     if total_days < 60:
         logging.error("資料不足以回測。")
         return
+    
+    # ── 趨勢健康度預警 ──────────────────────────────────
+    trend_score = trend_health_check(stock)
+    if trend_score is not None and trend_score < 40:
+        print("⚠️  注意：此股票趨勢評分過低，回測結果僅供策略研究，不建議實際操作。")
+    # ─────────────────────────────────────────────────────
         
     holding = False
     buy_price = 0
@@ -116,8 +184,10 @@ def run_backtest(code, months=12):
         else:
             ma20 = sum(mock_stock.price[-20:]) / 20
             
-            # 判斷是否買進 (有多頭排列 MA20之上 + 買進訊號 + 無風險過濾)
-            if buy_signals and current_price > ma20 and not wait_signals:
+            # 判斷是否買進 (有多頭排列 MA20之上 + 季線 MA60 多頭 + 買進訊號 + 無風險過濾)
+            ma60_available = len(mock_stock.price) >= 60
+            ma60 = sum(mock_stock.price[-60:]) / 60 if ma60_available else ma20
+            if buy_signals and current_price > ma20 and current_price > ma60 and not wait_signals:
                 holding = True
                 buy_price = current_price
                 buy_date = current_date
