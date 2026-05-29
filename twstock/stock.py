@@ -166,9 +166,76 @@ class TPEXFetcher(BaseFetcher):
         return [self._make_datatuple(d) for d in original_data["tables"][0]["data"]]
 
 
+class ESBFetcher(BaseFetcher):
+    REPORT_URL = urllib.parse.urljoin(
+        TPEX_BASE_URL, "www/zh-tw/emerging/historical"
+    )
+
+    def __init__(self):
+        pass
+
+    def fetch(self, year: int, month: int, sid: str, retry: int = 5):
+        roc_year_month = "%d/%02d" % (year - 1911, month)
+        params = {
+            "code": sid,
+            "date": roc_year_month,
+            "response": "json",
+        }
+        session = get_session()
+        for retry_i in range(retry):
+            r = session.get(self.REPORT_URL, params=params, proxies=get_proxies())
+            try:
+                data = r.json()
+            except JSONDecodeError:
+                continue
+            else:
+                break
+        else:
+            # Fail in all retries
+            data = {"tables": []}
+
+        data["data"] = self.purify(data)
+        return data
+
+    def _convert_date(self, date):
+        """Convert '106/05/01' to '2017/05/01'"""
+        return "/".join([str(int(date.split("/")[0]) + 1911)] + date.split("/")[1:])
+
+    def _make_datatuple(self, data):
+        date_val = datetime.datetime.strptime(
+            self._convert_date(data[0].replace("*", "").replace("＊", "")), "%Y/%m/%d"
+        )
+        capacity_val = int(data[1].replace(",", ""))
+        turnover_val = int(data[2].replace(",", ""))
+        close_val = None if data[5] == "--" else float(data[5].replace(",", ""))
+        open_val = close_val
+        high_val = None if data[3] == "--" else float(data[3].replace(",", ""))
+        low_val = None if data[4] == "--" else float(data[4].replace(",", ""))
+        change_val = 0.0
+        transaction_val = int(data[6].replace(",", ""))
+        return DATATUPLE(
+            date=date_val,
+            capacity=capacity_val,
+            turnover=turnover_val,
+            open=open_val,
+            high=high_val,
+            low=low_val,
+            close=close_val,
+            change=change_val,
+            transaction=transaction_val,
+            note="",
+        )
+
+    def purify(self, original_data):
+        if "tables" not in original_data or not original_data["tables"]:
+            return []
+        return [self._make_datatuple(d) for d in original_data["tables"][0]["data"]]
+
+
 DATA_FETCHER = {
     "twse": TWSEFetcher,
     "tpex": TPEXFetcher,
+    "esb": ESBFetcher,
 }
 
 
@@ -183,7 +250,7 @@ class Stock(analytics.Analytics):
         Args:
             sid (str): Stock ID
             initial_fetch (bool): Fetch data when initializing
-            force_data_source (str): Force data source, can be 'twse' or 'tpex',
+            force_data_source (str): Force data source, can be 'twse', 'tpex', or 'esb',
                 if not set, will use the data source from stock codes database,
                 if set, it also implied that we will not check if the stock ID is in the database.
         """
