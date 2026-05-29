@@ -131,16 +131,17 @@ def _get_esb(stock_id: str) -> dict:
 
         # Documented constraints:
         # 1. open: No open price is provided by the XML API, so it is set to None.
-        # 2. fullname: No company fullname is provided in the XML, so SymbolName is used as a fallback.
+        # 2. fullname: Look up in esb_fullname database. If not found, use SymbolName as a fallback.
         # 3. best_bid_price/volume & best_ask_price/volume (Scheme B):
         #    Parse all broker quotes in <quotesDetail>, sort, and take the top 5.
+        fullname = twstock.esb_fullname.get(symbol_id, symbol_name)
         result = {
             "timestamp": timestamp,
             "info": {
                 "code": symbol_id,
                 "channel": f"{symbol_id}.tw",
                 "name": symbol_name,
-                "fullname": symbol_name,  # Fallback to SymbolName (Issue 2)
+                "fullname": fullname,
                 "time": dt_str
             },
             "realtime": {}

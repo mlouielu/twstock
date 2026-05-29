@@ -9,7 +9,7 @@ from twstock import mock
 from twstock import realtime
 
 from twstock.analytics import BestFourPoint
-from twstock.codes import __update_codes, twse, tpex, codes, esb
+from twstock.codes import __update_codes, twse, tpex, codes, esb, esb_fullname
 from twstock.stock import Stock
 
 try:

@@ -19,11 +19,21 @@ PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 TPEX_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, "tpex_equities.csv")
 TWSE_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, "twse_equities.csv")
 ESB_EQUITIES_CSV_PATH = os.path.join(PACKAGE_DIRECTORY, "esb_equities.csv")
+ESB_FULLNAME_JSON_PATH = os.path.join(PACKAGE_DIRECTORY, "esb_fullname.json")
 
 codes = {}
 tpex = {}
 twse = {}
 esb = {}
+esb_fullname = {}
+
+if os.path.exists(ESB_FULLNAME_JSON_PATH):
+    import json
+    try:
+        with open(ESB_FULLNAME_JSON_PATH, encoding="utf-8") as f:
+            esb_fullname = json.load(f)
+    except Exception:
+        pass
 
 
 def read_csv(path, types):
