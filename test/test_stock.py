@@ -1,9 +1,21 @@
 import datetime
 import unittest
+from unittest.mock import patch
 import vcr
 from twstock import stock
 
 MY_VCR = vcr.VCR(cassette_library_dir="test/cassettes", record_mode="none")
+
+
+class MockDatetime(datetime.datetime):
+    @classmethod
+    def today(cls):
+        return datetime.datetime(2026, 5, 15)
+
+    @classmethod
+    def now(cls, tz=None):
+        return datetime.datetime(2026, 5, 15, tzinfo=tz)
+
 
 
 class FetcherTest(object):
@@ -197,8 +209,15 @@ class StockTest(object):
 
 class TWSEStockTest(unittest.TestCase, StockTest):
     @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(cls):
+        cls.original_datetime = stock.datetime.datetime
+        stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
         cls.stk = stock.Stock("2330")
 
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
@@ -272,8 +291,15 @@ class TWSEStockTest(unittest.TestCase, StockTest):
 
 class TPEXStockTest(unittest.TestCase, StockTest):
     @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("tpex_6223_recent.yaml")
     def setUpClass(cls):
+        cls.original_datetime = stock.datetime.datetime
+        stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
         cls.stk = stock.Stock("6223")
 
     @MY_VCR.use_cassette("tpex_6223_recent.yaml")
@@ -343,3 +369,59 @@ class TPEXStockTest(unittest.TestCase, StockTest):
                 583000,
             ],
         )
+
+
+class ESBFetcherTest(unittest.TestCase):
+    fetcher = stock.ESBFetcher()
+
+    def test_convert_date(self):
+        date = "106/05/01"
+        cv_date = self.fetcher._convert_date(date)
+        self.assertEqual(cv_date, "2017/05/01")
+
+    def test_make_datatuple(self):
+        data = [
+            "106/05/02",
+            "45,851",
+            "9,053,856",
+            "199.00",
+            "195.50",
+            "196.50",
+            "15,718",
+        ]
+        dt = self.fetcher._make_datatuple(data)
+        self.assertEqual(dt.date, datetime.datetime(2017, 5, 2))
+        self.assertEqual(dt.capacity, 45851)
+        self.assertEqual(dt.turnover, 9053856)
+        self.assertEqual(dt.open, 196.5)
+        self.assertEqual(dt.high, 199.0)
+        self.assertEqual(dt.low, 195.5)
+        self.assertEqual(dt.close, 196.5)
+        self.assertEqual(dt.change, 0.0)
+        self.assertEqual(dt.transaction, 15718)
+
+
+class ESBStockTest(unittest.TestCase, StockTest):
+    @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
+    @MY_VCR.use_cassette("esb_1260_recent.yaml")
+    def setUpClass(cls):
+        cls.original_datetime = stock.datetime.datetime
+        stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
+        cls.stk = stock.Stock("1260")
+
+    @MY_VCR.use_cassette("esb_1260_recent.yaml")
+    def test_fetch_31(self):
+        super().test_fetch_31()
+
+    @MY_VCR.use_cassette("esb_1260_2026_05.yaml")
+    def test_price(self):
+        self.stk.fetch(2026, 5)
+        self.assertIsInstance(self.stk.price, list)
+        self.assertEqual(len(self.stk.price), len(self.stk.data))
+        self.assertEqual(self.stk.price, [d.close for d in self.stk.data])
+

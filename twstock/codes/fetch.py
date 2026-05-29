@@ -17,6 +17,7 @@ from twstock.proxy import get_proxies, get_session
 
 TWSE_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=2"
 TPEX_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=4"
+ESB_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=5"
 ROW = namedtuple(
     "Row", ["type", "code", "name", "ISIN", "start", "market", "group", "CFI"]
 )
@@ -56,6 +57,17 @@ def to_csv(url, path):
         for d in data:
             writer.writerow([_ for _ in d])
 
+def fetch_esb_fullname(dest_path):
+    try:
+        r = requests.get("https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_R", timeout=10)
+        if r.status_code == 200:
+            import json
+            mapping = {item["SecuritiesCompanyCode"].strip(): item["CompanyName"].strip() for item in r.json()}
+            with open(dest_path, "w", encoding="utf-8") as f:
+                json.dump(mapping, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
 
 def __update_codes():
     def get_directory():
@@ -63,8 +75,14 @@ def __update_codes():
 
     to_csv(TWSE_EQUITIES_URL, os.path.join(get_directory(), "twse_equities.csv"))
     to_csv(TPEX_EQUITIES_URL, os.path.join(get_directory(), "tpex_equities.csv"))
+    to_csv(ESB_EQUITIES_URL, os.path.join(get_directory(), "esb_equities.csv"))
+
+    fetch_esb_fullname(os.path.join(get_directory(), "esb_fullname.json"))
 
 
 if __name__ == "__main__":
     to_csv(TWSE_EQUITIES_URL, "twse_equities.csv")
     to_csv(TPEX_EQUITIES_URL, "tpex_equities.csv")
+    to_csv(ESB_EQUITIES_URL, "esb_equities.csv")
+
+    fetch_esb_fullname("esb_fullname.json")

@@ -40,6 +40,14 @@ class RealtimeTest(unittest.TestCase):
         self.assertTrue(stock["success"])
         self.assertEqual(stock["info"]["code"], "6223")
 
+    def test_realtime_get_esb_id(self):
+        stock = realtime.get("1260")
+
+        self.assertTrue(stock["success"])
+        self.assertEqual(stock["info"]["code"], "1260")
+        self.assertEqual(stock["info"]["name"], "富味鄉")
+        self.assertEqual(stock["info"]["fullname"], "富味鄉食品股份有限公司")
+
 
 class MockRealtimeTest(unittest.TestCase):
     @classmethod
@@ -71,3 +79,11 @@ class MockRealtimeTest(unittest.TestCase):
         self.assertEqual(s["2330"]["info"]["code"], "2330")
         self.assertEqual(s["2330"]["realtime"]["latest_trade_price"], "214.50")
         self.assertTrue(s["2337"]["success"])
+
+    def test_mock_esb_stock_id(self):
+        s = realtime.get("1260")
+
+        self.assertTrue(s["success"])
+        self.assertEqual(s["info"]["code"], "1260")
+        self.assertEqual(s["realtime"]["latest_trade_price"], "100.00")
+
