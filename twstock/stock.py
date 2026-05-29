@@ -183,10 +183,10 @@ class ESBFetcher(BaseFetcher):
         }
         session = get_session()
         for retry_i in range(retry):
-            r = session.get(self.REPORT_URL, params=params, proxies=get_proxies())
             try:
+                r = session.get(self.REPORT_URL, params=params, proxies=get_proxies(), timeout=5)
                 data = r.json()
-            except JSONDecodeError:
+            except (requests.RequestException, JSONDecodeError):
                 continue
             else:
                 break
@@ -201,7 +201,7 @@ class ESBFetcher(BaseFetcher):
         """Convert '106/05/01' to '2017/05/01'"""
         return "/".join([str(int(date.split("/")[0]) + 1911)] + date.split("/")[1:])
 
-    def _make_datatuple(self, data):
+    def _make_datatuple(self, data, change_val=0.0):
         date_val = datetime.datetime.strptime(
             self._convert_date(data[0].replace("*", "").replace("＊", "")), "%Y/%m/%d"
         )
@@ -211,7 +211,6 @@ class ESBFetcher(BaseFetcher):
         open_val = close_val
         high_val = None if data[3] == "--" else float(data[3].replace(",", ""))
         low_val = None if data[4] == "--" else float(data[4].replace(",", ""))
-        change_val = 0.0
         transaction_val = int(data[6].replace(",", ""))
         return DATATUPLE(
             date=date_val,
@@ -229,7 +228,21 @@ class ESBFetcher(BaseFetcher):
     def purify(self, original_data):
         if "tables" not in original_data or not original_data["tables"]:
             return []
-        return [self._make_datatuple(d) for d in original_data["tables"][0]["data"]]
+        rows = original_data["tables"][0]["data"]
+        results = []
+        prev_close = None
+        for d in rows:
+            close_val = None if d[5] == "--" else float(d[5].replace(",", ""))
+            if prev_close is not None and close_val is not None:
+                change_val = round(close_val - prev_close, 2)
+            else:
+                change_val = 0.0
+
+            if close_val is not None:
+                prev_close = close_val
+
+            results.append(self._make_datatuple(d, change_val))
+        return results
 
 
 DATA_FETCHER = {

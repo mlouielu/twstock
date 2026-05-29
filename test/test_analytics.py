@@ -100,17 +100,18 @@ class AnalyticsTest(unittest.TestCase):
 
 class BestFourPointTest(unittest.TestCase):
     @classmethod
+    def restore_datetime(self):
+        stock.datetime.datetime = self.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(self):
         self.original_datetime = stock.datetime.datetime
         stock.datetime.datetime = MockDatetime
+        self.addClassCleanup(self.restore_datetime)
         self.stock = stock.Stock("2330")
         self.legacy = legacy.LegacyBestFourPoint(self.stock)
         self.ng = analytics.BestFourPoint(self.stock)
-
-    @classmethod
-    def tearDownClass(self):
-        stock.datetime.datetime = self.original_datetime
 
     def test_bias_ratio(self):
         self.assertEqual(self.ng.bias_ratio(), self.legacy.bias_ratio())

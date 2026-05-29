@@ -57,6 +57,17 @@ def to_csv(url, path):
         for d in data:
             writer.writerow([_ for _ in d])
 
+def fetch_esb_fullname(dest_path):
+    try:
+        r = requests.get("https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_R", timeout=10)
+        if r.status_code == 200:
+            import json
+            mapping = {item["SecuritiesCompanyCode"].strip(): item["CompanyName"].strip() for item in r.json()}
+            with open(dest_path, "w", encoding="utf-8") as f:
+                json.dump(mapping, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
 
 def __update_codes():
     def get_directory():
@@ -66,17 +77,7 @@ def __update_codes():
     to_csv(TPEX_EQUITIES_URL, os.path.join(get_directory(), "tpex_equities.csv"))
     to_csv(ESB_EQUITIES_URL, os.path.join(get_directory(), "esb_equities.csv"))
 
-    # Fetch full names for ESB stocks from TPEx OpenAPI
-    try:
-        session = get_session()
-        r = session.get("https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_R", timeout=10)
-        if r.status_code == 200:
-            import json
-            mapping = {item["SecuritiesCompanyCode"].strip(): item["CompanyName"].strip() for item in r.json()}
-            with open(os.path.join(get_directory(), "esb_fullname.json"), "w", encoding="utf-8") as f:
-                json.dump(mapping, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    fetch_esb_fullname(os.path.join(get_directory(), "esb_fullname.json"))
 
 
 if __name__ == "__main__":
@@ -84,12 +85,4 @@ if __name__ == "__main__":
     to_csv(TPEX_EQUITIES_URL, "tpex_equities.csv")
     to_csv(ESB_EQUITIES_URL, "esb_equities.csv")
 
-    try:
-        r = requests.get("https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_R", timeout=10)
-        if r.status_code == 200:
-            import json
-            mapping = {item["SecuritiesCompanyCode"].strip(): item["CompanyName"].strip() for item in r.json()}
-            with open("esb_fullname.json", "w", encoding="utf-8") as f:
-                json.dump(mapping, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    fetch_esb_fullname("esb_fullname.json")

@@ -20,15 +20,16 @@ class MockDatetime(datetime.datetime):
 
 
 class CLIFunctionTest(unittest.TestCase):
+    def restore_datetime(self):
+        from twstock import stock
+        stock.datetime.datetime = self.original_datetime
+
     def setUp(self):
         self.stocks = ["2330", "6223"]
         from twstock import stock
         self.original_datetime = stock.datetime.datetime
         stock.datetime.datetime = MockDatetime
-
-    def tearDown(self):
-        from twstock import stock
-        stock.datetime.datetime = self.original_datetime
+        self.addCleanup(self.restore_datetime)
 
     @MY_VCR.use_cassette("cli_2330_6223.yaml")
     def test_best_four_point(self):

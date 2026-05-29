@@ -209,15 +209,16 @@ class StockTest(object):
 
 class TWSEStockTest(unittest.TestCase, StockTest):
     @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(cls):
         cls.original_datetime = stock.datetime.datetime
         stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
         cls.stk = stock.Stock("2330")
-
-    @classmethod
-    def tearDownClass(cls):
-        stock.datetime.datetime = cls.original_datetime
 
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def test_fetch_31(self):
@@ -290,15 +291,16 @@ class TWSEStockTest(unittest.TestCase, StockTest):
 
 class TPEXStockTest(unittest.TestCase, StockTest):
     @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("tpex_6223_recent.yaml")
     def setUpClass(cls):
         cls.original_datetime = stock.datetime.datetime
         stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
         cls.stk = stock.Stock("6223")
-
-    @classmethod
-    def tearDownClass(cls):
-        stock.datetime.datetime = cls.original_datetime
 
     @MY_VCR.use_cassette("tpex_6223_recent.yaml")
     def test_fetch_31(self):
@@ -401,15 +403,16 @@ class ESBFetcherTest(unittest.TestCase):
 
 class ESBStockTest(unittest.TestCase, StockTest):
     @classmethod
+    def restore_datetime(cls):
+        stock.datetime.datetime = cls.original_datetime
+
+    @classmethod
     @MY_VCR.use_cassette("esb_1260_recent.yaml")
     def setUpClass(cls):
         cls.original_datetime = stock.datetime.datetime
         stock.datetime.datetime = MockDatetime
+        cls.addClassCleanup(cls.restore_datetime)
         cls.stk = stock.Stock("1260")
-
-    @classmethod
-    def tearDownClass(cls):
-        stock.datetime.datetime = cls.original_datetime
 
     @MY_VCR.use_cassette("esb_1260_recent.yaml")
     def test_fetch_31(self):

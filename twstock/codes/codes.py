@@ -54,4 +54,5 @@ def read_csv(path, types):
 
 read_csv(TPEX_EQUITIES_CSV_PATH, "tpex")
 read_csv(TWSE_EQUITIES_CSV_PATH, "twse")
-read_csv(ESB_EQUITIES_CSV_PATH, "esb")
+if os.path.exists(ESB_EQUITIES_CSV_PATH):
+    read_csv(ESB_EQUITIES_CSV_PATH, "esb")

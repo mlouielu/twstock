@@ -7,12 +7,8 @@ import requests
 import twstock
 import sys
 import xml.etree.ElementTree as ET
-import urllib3
-
 from twstock.proxy import get_proxies, get_session
 
-# Disable SSL verification warnings for ESB queries
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 SESSION_URL = "http://mis.twse.com.tw/stock/index.jsp"
 STOCKINFO_URL = (
@@ -98,10 +94,35 @@ def get_raw(stocks) -> dict:
 
 
 def _get_esb(stock_id: str) -> dict:
+    if mock:
+        return {
+            "timestamp": 1780044900.0,
+            "info": {
+                "code": stock_id,
+                "channel": f"{stock_id}.tw",
+                "name": twstock.codes.get(stock_id).name if stock_id in twstock.codes else "模擬股",
+                "fullname": twstock.esb_fullname.get(stock_id, "模擬股份有限公司"),
+                "time": "2026/05/29 16:55"
+            },
+            "realtime": {
+                "latest_trade_price": "100.00",
+                "trade_volume": "1000",
+                "accumulate_trade_volume": "50000",
+                "open": "101.00",
+                "high": "105.00",
+                "low": "99.00",
+                "best_bid_price": ["99.50", "99.00", "98.50", "98.00", "97.50"],
+                "best_bid_volume": ["10", "20", "30", "40", "50"],
+                "best_ask_price": ["100.50", "101.00", "101.50", "102.00", "102.50"],
+                "best_ask_volume": ["10", "20", "30", "40", "50"]
+            },
+            "success": True
+        }
+
     url = "https://mis.tpex.org.tw/Quote.asmx/GETQ20"
     session = get_session()
     try:
-        r = session.post(url, data={"SymbolID": stock_id}, timeout=5)
+        r = session.post(url, data={"SymbolID": stock_id}, timeout=5, proxies=get_proxies())
         if r.status_code != 200:
             return {"rtmessage": "HTTP Error", "rtcode": str(r.status_code), "success": False}
 
@@ -130,7 +151,7 @@ def _get_esb(stock_id: str) -> dict:
             dt_str = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
         # Documented constraints:
-        # 1. open: No open price is provided by the XML API, so it is set to None.
+        # 1. open: Set to TradeStatisticAverage (weighted average price).
         # 2. fullname: Look up in esb_fullname database. If not found, use SymbolName as a fallback.
         # 3. best_bid_price/volume & best_ask_price/volume (Scheme B):
         #    Parse all broker quotes in <quotesDetail>, sort, and take the top 5.
