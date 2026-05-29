@@ -130,8 +130,6 @@ interactions:
       - https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2026%2F03%2F01&code=6223&response=json
       Server:
       - cloudflare
-      Transfer-Encoding:
-      - chunked
       cf-cache-status:
       - DYNAMIC
     status:
@@ -184,8 +182,6 @@ interactions:
         HttpOnlywww; HttpOnly
       Strict-Transport-Security:
       - max-age=31535000; includeSubDomains; preload
-      Transfer-Encoding:
-      - chunked
       Vary:
       - Origin
       - Access-Control-Request-Method
@@ -231,8 +227,6 @@ interactions:
       - https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2026%2F04%2F01&code=6223&response=json
       Server:
       - cloudflare
-      Transfer-Encoding:
-      - chunked
       cf-cache-status:
       - DYNAMIC
     status:
@@ -282,6 +276,105 @@ interactions:
       - cloudflare
       Set-Cookie:
       - JSESSIONID=947130E3428436CAFB93849D1F8FC6CB; Path=/; SameSite=None; Secure;
+        HttpOnlywww; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31535000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-cache-status:
+      - DYNAMIC
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.33.1
+    method: GET
+    uri: http://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2026%2F05%2F01&code=6223&response=json
+  response:
+    body:
+      string: "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body>\r\n<center><h1>301
+        Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+    headers:
+      CF-RAY:
+      - a034883c9e06f1fd-KHH
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/html
+      Date:
+      - Fri, 29 May 2026 09:39:29 GMT
+      Location:
+      - https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2026%2F05%2F01&code=6223&response=json
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      cf-cache-status:
+      - DYNAMIC
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.33.1
+    method: GET
+    uri: https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?date=2026%2F05%2F01&code=6223&response=json
+  response:
+    body:
+      string: "{\"tables\":[{\"title\":\"\u500B\u80A1\u65E5\u6210\u4EA4\u8CC7\u8A0A\",\"subtitle\":\"6223
+        \u65FA\u77FD 115\u5E7405\u6708\",\"date\":\"20260501\",\"data\":[[\"115/05/04\",\"1,367\",\"6,935,688\",\"5,005.00\",\"5,200.00\",\"4,910.00\",\"5,165.00\",\"240.00\",\"8,181\"],[\"115/05/05\",\"1,319\",\"6,562,360\",\"5,150.00\",\"5,150.00\",\"4,865.00\",\"5,000.00\",\"-165.00\",\"11,535\"],[\"115/05/06\",\"1,312\",\"6,498,248\",\"5,095.00\",\"5,115.00\",\"4,850.00\",\"4,950.00\",\"-50.00\",\"7,824\"],[\"115/05/07\",\"948\",\"4,740,289\",\"4,965.00\",\"5,050.00\",\"4,865.00\",\"5,030.00\",\"80.00\",\"5,385\"],[\"115/05/08\",\"1,723\",\"8,879,704\",\"4,930.00\",\"5,370.00\",\"4,930.00\",\"5,025.00\",\"-5.00\",\"8,785\"],[\"115/05/11\",\"2,117\",\"10,413,985\",\"4,860.00\",\"5,125.00\",\"4,710.00\",\"4,985.00\",\"-40.00\",\"8,610\"],[\"115/05/12\",\"1,001\",\"5,439,210\",\"5,315.00\",\"5,480.00\",\"5,250.00\",\"5,480.00\",\"495.00\",\"6,982\"],[\"115/05/13\",\"3,023\",\"16,756,862\",\"5,490.00\",\"5,820.00\",\"5,315.00\",\"5,720.00\",\"240.00\",\"12,082\"],[\"115/05/14\",\"545\",\"3,428,421\",\"6,290.00\",\"6,290.00\",\"6,290.00\",\"6,290.00\",\"570.00\",\"3,010\"],[\"115/05/15\",\"2,198\",\"13,717,994\",\"6,280.00\",\"6,665.00\",\"5,895.00\",\"5,895.00\",\"-395.00\",\"15,786\"],[\"115/05/18\",\"1,556\",\"9,430,737\",\"6,000.00\",\"6,245.00\",\"5,895.00\",\"6,135.00\",\"240.00\",\"6,882\"],[\"115/05/19\",\"1,714\",\"10,104,577\",\"6,250.00\",\"6,275.00\",\"5,695.00\",\"5,730.00\",\"-405.00\",\"11,203\"],[\"115/05/20\",\"1,034\",\"6,028,311\",\"5,800.00\",\"6,015.00\",\"5,680.00\",\"5,680.00\",\"-50.00\",\"5,243\"],[\"115/05/21\",\"1,252\",\"7,248,980\",\"6,160.00\",\"6,160.00\",\"5,530.00\",\"5,650.00\",\"-30.00\",\"7,441\"],[\"115/05/22\",\"1,253\",\"7,446,128\",\"5,880.00\",\"6,035.00\",\"5,765.00\",\"6,035.00\",\"385.00\",\"5,900\"],[\"115/05/25\",\"888\",\"5,609,637\",\"6,240.00\",\"6,465.00\",\"6,115.00\",\"6,200.00\",\"165.00\",\"6,477\"],[\"115/05/26\",\"769\",\"4,822,014\",\"6,425.00\",\"6,425.00\",\"6,120.00\",\"6,240.00\",\"40.00\",\"4,236\"],[\"115/05/27\",\"866\",\"5,573,540\",\"6,400.00\",\"6,645.00\",\"6,280.00\",\"6,390.00\",\"150.00\",\"5,493\"],[\"115/05/28\",\"1,076\",\"6,578,734\",\"6,390.00\",\"6,450.00\",\"5,855.00\",\"5,915.00\",\"-475.00\",\"12,946\"],[\"115/05/29\",\"7,136\",\"42,620,362\",\"6,165.00\",\"6,200.00\",\"5,870.00\",\"5,960.00\",\"45.00\",\"6,357\"]],\"fields\":[\"\u65E5
+        \u671F\",\"\u6210\u4EA4\u5F35\u6578\",\"\u6210\u4EA4\u4EDF\u5143\",\"\u958B\u76E4\",\"\u6700\u9AD8\",\"\u6700\u4F4E\",\"\u6536\u76E4\",\"\u6F32\u8DCC\",\"\u7B46\u6578\"],\"notes\":[\"\u4EE5\u4E0A\u8CC7\u6599\u4E0D\u542B\u4E0A\u6AC3\u80A1\u7968\u9245\u984D\u4EA4\u6613\",\"ETF\u8B49\u5238\u4EE3\u865F\u7B2C\u516D\u78BC\u70BAK\u3001C\u8005\uFF0C\u8868\u793A\u8A72ETF\u4EE5\u5916\u5E63\u4EA4\u6613\uFF0C\u5176\u4E00\u4EA4\u6613\u55AE\u4F4D(\u5F35)\u61C9\u70BA100\u53D7\u76CA\u6B0A\u6216\u5176\u6574\u500D\u6578\uFF0C\u8ACB\u8A73\u5176\u516C\u958B\u8AAA\u660E\u66F8\u3002\"],\"totalCount\":20,\"summary\":[]}],\"date\":\"20260501\",\"code\":\"6223\",\"name\":\"\u65FA\u77FD\",\"showListPriceNote\":false,\"showListPriceLink\":false,\"flagField\":\"\u5F35\u6578\",\"stat\":\"ok\"}"
+    headers:
+      CF-RAY:
+      - a034883ceba5f230-KHH
+      Cache-Control:
+      - max-age=600, private, must-revalidate
+      - private
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'self' *.twse.com.tw *.tdcc.com.tw digitalprocesssys-epassbook.cdn.hinet.net
+        http://digitalprocesssyst-epassbook.cdn.hinet.net;
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Fri, 29 May 2026 09:39:29 GMT
+      Permissions-Policy:
+      - accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(),
+        microphone=(), payment=(), usb=()
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - JSESSIONID=9C77710D8A9BE30BF4E768B05FFD2B95; Path=/; SameSite=None; Secure;
         HttpOnlywww; HttpOnly
       Strict-Transport-Security:
       - max-age=31535000; includeSubDomains; preload

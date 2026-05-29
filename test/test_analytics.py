@@ -1,10 +1,23 @@
+import datetime
 import unittest
+from unittest.mock import patch
 import vcr
 from twstock import stock
 from twstock import analytics
 from twstock import legacy
 
 MY_VCR = vcr.VCR(cassette_library_dir="test/cassettes", record_mode="none")
+
+
+class MockDatetime(datetime.datetime):
+    @classmethod
+    def today(cls):
+        return datetime.datetime(2026, 5, 15)
+
+    @classmethod
+    def now(cls, tz=None):
+        return datetime.datetime(2026, 5, 15, tzinfo=tz)
+
 
 
 class AnalyticsTest(unittest.TestCase):
@@ -89,9 +102,15 @@ class BestFourPointTest(unittest.TestCase):
     @classmethod
     @MY_VCR.use_cassette("twse_2330_recent.yaml")
     def setUpClass(self):
+        self.original_datetime = stock.datetime.datetime
+        stock.datetime.datetime = MockDatetime
         self.stock = stock.Stock("2330")
         self.legacy = legacy.LegacyBestFourPoint(self.stock)
         self.ng = analytics.BestFourPoint(self.stock)
+
+    @classmethod
+    def tearDownClass(self):
+        stock.datetime.datetime = self.original_datetime
 
     def test_bias_ratio(self):
         self.assertEqual(self.ng.bias_ratio(), self.legacy.bias_ratio())

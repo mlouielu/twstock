@@ -158,7 +158,7 @@ def _get_esb(stock_id: str) -> dict:
         result["realtime"]["latest_trade_price"] = get_val("TradePrice")
         result["realtime"]["trade_volume"] = get_val("TradeVol")
         result["realtime"]["accumulate_trade_volume"] = get_val("TradeStatisticTtlVol")
-        result["realtime"]["open"] = None  # No open price provided (Issue 1)
+        result["realtime"]["open"] = get_val("TradeStatisticAverage")  # Open is replaced by TradeStatisticAverage
         result["realtime"]["high"] = get_val("TradeStatisticHigh")
         result["realtime"]["low"] = get_val("TradeStatisticLow")
 
@@ -232,6 +232,15 @@ def get(stocks, retry=3):
             formatted = _get_esb(s)
             if formatted.get("success"):
                 result[s] = formatted
+
+        if not result:
+            if non_esb_stocks and 'non_esb_data' in locals():
+                non_esb_data["success"] = False
+                if "rtmessage" not in non_esb_data:
+                    non_esb_data["rtmessage"] = "Empty Query."
+                    non_esb_data["rtcode"] = "5001"
+                return non_esb_data
+            return {"success": False, "rtmessage": "Empty Query.", "rtcode": "5001"}
 
         result["success"] = True
         return result
