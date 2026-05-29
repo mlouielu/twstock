@@ -17,6 +17,7 @@ from twstock.proxy import get_proxies, get_session
 
 TWSE_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=2"
 TPEX_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=4"
+ESB_EQUITIES_URL = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=5"
 ROW = namedtuple(
     "Row", ["type", "code", "name", "ISIN", "start", "market", "group", "CFI"]
 )
@@ -63,8 +64,10 @@ def __update_codes():
 
     to_csv(TWSE_EQUITIES_URL, os.path.join(get_directory(), "twse_equities.csv"))
     to_csv(TPEX_EQUITIES_URL, os.path.join(get_directory(), "tpex_equities.csv"))
+    to_csv(ESB_EQUITIES_URL, os.path.join(get_directory(), "esb_equities.csv"))
 
 
 if __name__ == "__main__":
     to_csv(TWSE_EQUITIES_URL, "twse_equities.csv")
     to_csv(TPEX_EQUITIES_URL, "tpex_equities.csv")
+    to_csv(ESB_EQUITIES_URL, "esb_equities.csv")
