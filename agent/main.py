@@ -232,63 +232,198 @@ def generate_markdown_report(report_data, market_stats=None):
     report_lines.append("*💡 這是一份自動生成的報告，僅供決策輔助，不構成任何投資建議。*")
     return "\n".join(report_lines)
 
-def generate_telegram_report(report_data, market_stats=None):
+def generate_telegram_report(report_data, market_stats=None, open_positions=None):
     """
-    專為 Telegram HTML Parse Mode 設計的高資訊密度推播排版
-    清晰呈現：今日總體進場指引、推薦進場標的、各股進場燈號
+    專為 Telegram 設計的【高勝率實戰獲利指引】推播排版
+    核心目標：幫助投資人快速做出正確買賣決策，最大化獲利並嚴控持倉風險。
     """
     today = datetime.now().strftime("%Y-%m-%d")
-    lines = [f"🎯 <b>台股代理人每日股市指引 ({today})</b>\n"]
+    lines = [f"🎯 <b>台股操盤實戰獲利指引 ({today})</b>\n"]
     
+    # 1. 整理持倉分類與行動建議 (停利 / 停損 / 續抱)
+    take_profit_items = []  # 建議停利/獲利了結
+    stop_loss_items = []    # 建議停損/防守減碼
+    running_profit_items = []  # 強勢獲利續抱
+    
+    total_cost = 0.0
+    total_market_val = 0.0
+    
+    if open_positions:
+        for p_code, p_data in open_positions.items():
+            p_price = p_data["buy_price"]
+            p_shares = p_data.get("buy_shares", 0)
+            p_item = next((item for item in report_data if item['code'] == p_code), None)
+            curr_price = p_item['price'] if p_item and p_item['price'] != "N/A" else p_price
+            s_info = twstock.codes.get(p_code)
+            stock_name = p_item['name'] if p_item else (s_info.name if s_info else "未知")
+            
+            if curr_price != "N/A":
+                cost = p_price * p_shares
+                m_val = curr_price * p_shares
+                total_cost += cost
+                total_market_val += m_val
+                profit_amt = m_val - cost
+                roi = (profit_amt / cost * 100) if cost > 0 else 0.0
+                
+                eval_res = p_item.get('eval', {}) if p_item else {}
+                score = eval_res.get('score', 50)
+                sl = eval_res.get('stop_loss', 0.0)
+                verdict = eval_res.get('verdict', '')
+                signals = p_item.get('signals', []) if p_item else []
+                signals_str = " ".join(signals)
+                
+                # 停利條件：獲利 > 20% 且出現高檔KD死叉/超買，或獲利已超過 100%
+                is_take_profit = False
+                tp_reason = ""
+                if roi >= 20.0 and ("死亡交叉" in signals_str or "超買" in signals_str):
+                    is_take_profit = True
+                    tp_reason = "高檔指標轉弱/KD死叉，建議分批獲利了結 1/2 鎖定利潤"
+                elif roi >= 100.0:
+                    is_take_profit = True
+                    tp_reason = f"波段獲利已翻倍 ({roi:+.1f}%)，建議分批減碼落袋為安"
+                
+                # 停損/減碼條件：被判定不宜進場/嚴禁追高、分數<42、或跌破防守價且虧損
+                is_stop_loss = False
+                sl_reason = ""
+                if ("不宜" in verdict or "嚴禁" in verdict or score < 42 or curr_price < sl) and roi < 0:
+                    is_stop_loss = True
+                    sl_reason = f"跌破防守價 ({sl:.2f}) 或空頭排列，建議減碼防守避免虧損擴大"
+                elif ("不宜" in verdict or "嚴禁" in verdict or score < 42) and roi < 5.0:
+                    is_stop_loss = True
+                    sl_reason = "走勢偏弱動能不足，建議縮減部位回收資金"
+                    
+                info_dict = {
+                    "code": p_code,
+                    "name": stock_name,
+                    "buy_price": p_price,
+                    "curr_price": curr_price,
+                    "shares": p_shares,
+                    "cost": cost,
+                    "m_val": m_val,
+                    "profit": profit_amt,
+                    "roi": roi,
+                    "score": score,
+                    "sl": sl,
+                    "tp_reason": tp_reason,
+                    "sl_reason": sl_reason
+                }
+                
+                if is_take_profit:
+                    take_profit_items.append(info_dict)
+                elif is_stop_loss:
+                    stop_loss_items.append(info_dict)
+                elif roi >= 15.0:
+                    running_profit_items.append(info_dict)
+                    
+    total_profit = total_market_val - total_cost
+    total_roi = (total_profit / total_cost * 100) if total_cost > 0 else 0.0
+    
+    # 2. 篩選今日高勝率進場精選 (嚴選評分 >= 65 且 風報比 >= 1.5)
+    top_picks = []
     if market_stats:
-        m_verdict = market_stats.get("market_verdict", "🟡 觀望等待")
+        raw_picks = market_stats.get("top_picks", [])
+        top_picks = [p for p in raw_picks if p.get("eval", {}).get("score", 0) >= 65 and p.get("eval", {}).get("rrr", 0) >= 1.5][:3]
+        if not top_picks and raw_picks:
+            top_picks = raw_picks[:2]
+            
+    # ── 第一區塊：今日 3 秒操盤決策卡 ─────────────────────────
+    lines.append("⚡ <b>【今日 3 秒操盤決策卡】</b>")
+    if market_stats:
         can_enter = market_stats.get("can_enter_market", False)
-        can_enter_str = "🟢 <b>可以進場 (擇優佈局)</b>" if can_enter else "🔴 <b>暫緩進場 (保守防禦)</b>"
-        suggested_exp = market_stats.get("suggested_exposure", "30% ~ 50%")
-        bull_ma20 = market_stats.get("bull_ratio_ma20", 0.0)
-        buy_cnt = market_stats.get("buy_count", 0)
-        wait_cnt = market_stats.get("wait_count", 0)
-        sell_cnt = market_stats.get("sell_count", 0)
-        macro_ai = market_stats.get("macro_ai_insight")
+        env_badge = "🟢 <b>偏多擇優進攻</b>" if can_enter else "🔴 <b>謹慎保守防禦</b>"
+        suggested_exp = market_stats.get("suggested_exposure", "40% ~ 60%")
+        lines.append(f"• <b>大盤環境</b>: {env_badge} (建議水位: <code>{suggested_exp}</code>)")
         
-        lines.append(f"⚡ <b>【今日總體進場指引】</b>")
-        lines.append(f"• <b>大盤環境</b>: {m_verdict}")
-        lines.append(f"• <b>進場指引</b>: {can_enter_str}")
-        lines.append(f"• <b>建議水位</b>: <code>{suggested_exp}</code>")
-        lines.append(f"• <b>多空廣度</b>: {bull_ma20:.0f}% 站上月線 (可進場: {buy_cnt} / 觀望: {wait_cnt} / 減碼: {sell_cnt})")
+    lines.append("• <b>今日行動指引</b>:")
+    if top_picks:
+        buy_names = "、".join([f"<b>{p['code']} {p.get('name', '')}</b>" for p in top_picks])
+        lines.append(f"  🟢 <b>建議買進/加碼</b>: {buy_names}")
+    else:
+        lines.append("  🟢 <b>建議買進/加碼</b>: 今日無特別推薦標的，保留現金")
         
-        if macro_ai:
-            lines.append(f"• 🤖 <b>AI 總經</b>: <i>{macro_ai}</i>")
+    if take_profit_items:
+        tp_names = "、".join([f"<b>{x['code']} {x['name']}</b> ({x['roi']:+.1f}%)" for x in take_profit_items])
+        lines.append(f"  💰 <b>建議分批停利</b>: {tp_names}")
+        
+    if stop_loss_items:
+        sl_names = "、".join([f"<b>{x['code']} {x['name']}</b> ({x['roi']:+.1f}%)" for x in stop_loss_items])
+        lines.append(f"  🛑 <b>防守減碼警示</b>: {sl_names}")
+        
+    if running_profit_items:
+        run_names = "、".join([f"{x['code']} {x['name']}" for x in running_profit_items[:4]])
+        lines.append(f"  🏃‍♂️ <b>強勢續抱奔馳</b>: {run_names}")
+        
+    lines.append("")
+    
+    # ── 第二區塊：今日高勝率進場精選 ─────────────────────────
+    lines.append("🚀 <b>【今日高勝率進場精選】</b>")
+    if top_picks:
+        for p in top_picks:
+            ev = p.get("eval", {})
+            curr_p = p.get("price", "N/A")
+            sl = ev.get("stop_loss", 0.0)
+            target = ev.get("upside_target", 0.0)
+            rrr = ev.get("rrr", 1.0)
+            score = ev.get("score", 0)
+            entry_s = ev.get("suggested_entry", "分批進場")
             
-        lines.append("")
+            if isinstance(curr_p, (int, float)) and curr_p > 0:
+                down_pct = (sl - curr_p) / curr_p * 100
+                up_pct = (target - curr_p) / curr_p * 100
+                plan_detail = f"🛡️ 防守: <code>{sl:.2f}</code> ({down_pct:.1f}%) ➡️ 🏆 目標: <code>{target:.2f}</code> ({up_pct:+.1f}%)"
+            else:
+                plan_detail = f"🛡️ 防守: <code>{sl:.2f}</code> ➡️ 🏆 目標: <code>{target:.2f}</code>"
+                
+            ai_insight = p.get("ai_insight", "")
+            clean_ai = ""
+            if ai_insight:
+                clean_ai = ai_insight.replace("\n", " ")
+                if len(clean_ai) > 90:
+                    clean_ai = clean_ai[:87] + "..."
+                    
+            lines.append(f"🔹 <b>{p['code']} {p.get('name', '')}</b> (現價: {curr_p})")
+            lines.append(f"  ├ 🎯 <b>策略</b>: {entry_s} (評分: <code>{score}</code>)")
+            lines.append(f"  ├ {plan_detail}")
+            lines.append(f"  ├ ⚖️ <b>潛在風報比</b>: <b>{rrr:.2f}</b> (每承擔 1 元風險，期望賺 {rrr:.2f} 元)")
+            if clean_ai:
+                lines.append(f"  └ 💡 <b>AI 催化劑</b>: {clean_ai}")
+            lines.append("")
+    else:
+        lines.append("😴 今日市場無符合嚴選進場標準的標的，建議多看少做、保留現金。\n")
         
-        # 精選進場標的
-        top_picks = market_stats.get("top_picks", [])
-        lines.append(f"🚀 <b>【今日精選可進場標的】</b>")
-        if top_picks:
-            for p in top_picks[:5]:
-                ev = p.get("eval", {})
-                lines.append(f"🔹 <b>{p['code']} {p.get('name', '')}</b> (收盤: {p.get('price', '')})")
-                lines.append(f"  └ 評級: <b>{ev.get('verdict_badge', '')}</b> (評分: {ev.get('score', 0)}, 風報比: {ev.get('rrr', 1.0):.2f})")
-                lines.append(f"  └ 🎯 策略: {ev.get('suggested_entry', '')}")
-                lines.append(f"  └ 🛡️ 防守: {ev.get('stop_loss', 0.0):.2f} ➡️ 目標: {ev.get('upside_target', 0.0):.2f}")
-                ai_in = p.get("ai_insight")
-                if ai_in:
-                    lines.append(f"  └ 🤖 AI: {ai_in}")
-                lines.append("")
-        else:
-            lines.append("😴 今日無符合嚴選進場標準的標的，建議空手或觀望。\n")
+    # ── 第三區塊：真實持倉鎖利與風控 ─────────────────────────
+    if open_positions:
+        lines.append("💼 <b>【持倉獲利管理與風控】</b>")
+        lines.append(f"💰 總市值: <b>{total_market_val:,.0f} 元</b> | 總損益: <b>{total_roi:+.2f}% ({total_profit:+,.0f} 元)</b>\n")
+        
+        if take_profit_items:
+            lines.append("🚨 <b>【獲利了結提醒 (Take Profit)】:</b>")
+            for x in take_profit_items:
+                lines.append(f"• 💰 <b>{x['code']} {x['name']}</b>: 現價 {x['curr_price']:.2f} (<b>{x['roi']:+.2f}%</b>, {x['profit']:+,.0f}元)")
+                lines.append(f"  └ ⚠️ <i>{x['tp_reason']}</i>")
+            lines.append("")
             
-    # 全體觀察股速查燈號
-    lines.append("📋 <b>【觀察股進場燈號一覽】</b>")
-    for item in report_data:
-        ev = item.get("eval", {})
-        badge = ev.get("verdict_badge", "🟡 觀望")
-        score = ev.get("score", 50)
-        rrr = ev.get("rrr", 1.0)
-        lines.append(f"• {item['code']} {item.get('name', '')}: <b>{badge}</b> ({score}分, 風報比: {rrr:.2f})")
-        
-    lines.append("\n💡 <i>這是一份自動生成的報告，僅供決策輔助，不構成任何投資建議。</i>")
+        if stop_loss_items:
+            lines.append("🚨 <b>【停損減碼警示 (Stop Loss)】:</b>")
+            for x in stop_loss_items:
+                lines.append(f"• 🛑 <b>{x['code']} {x['name']}</b>: 現價 {x['curr_price']:.2f} (<b>{x['roi']:+.2f}%</b>, {x['profit']:+,.0f}元)")
+                lines.append(f"  └ ⚠️ <i>{x['sl_reason']}</i>")
+            lines.append("")
+            
+        if running_profit_items:
+            sorted_running = sorted(running_profit_items, key=lambda x: x['profit'], reverse=True)
+            lines.append("💎 <b>【核心獲利奔馳部位 (續抱)】:</b>")
+            for x in sorted_running[:4]:
+                lines.append(f"• <b>{x['code']} {x['name']}</b>: <b>{x['roi']:+.2f}%</b> (+{x['profit']:,.0f}元) ➡️ 續抱")
+            lines.append("")
+            
+        other_cnt = len(open_positions) - len(take_profit_items) - len(stop_loss_items) - min(4, len(running_profit_items))
+        if other_cnt > 0:
+            lines.append(f"<i>(其餘 {other_cnt} 檔標的表現平穩，發送 /portfolio 查看完整明細)</i>\n")
+            
+    # ── 第四區塊：快捷獲利指令 ───────────────────────────────
+    lines.append("────────────────────")
+    lines.append("📱 <b>實戰指令</b>: <code>/action</code> 今日決策卡 | <code>/top</code> 獲利潛力股 | <code>/alerts</code> 警報清單 | <code>/analyze [代號]</code>")
     return "\n".join(lines)
 
 def main():
@@ -338,35 +473,17 @@ def main():
                 # 平倉條件：被評為不宜進場/嚴禁進場、分數低於45、或跌破防守停損價
                 should_sell = ("不宜" in verdict) or ("嚴禁" in verdict) or (score < 45) or (latest_price < stop_loss)
                 
+                # 持倉風險監控邏輯
                 if code in open_positions:
+                    p_shares = open_positions[code].get("buy_shares", 0)
+                    p_price = open_positions[code].get("buy_price", 0.0)
+                    profit = (latest_price - p_price) * p_shares * 0.995
+                    roi = (latest_price - p_price) / p_price * 100 if p_price > 0 else 0.0
                     if should_sell:
-                        record_sell(code, today_date, latest_price)
-                        p_shares = open_positions[code].get("buy_shares", 0)
-                        profit = (latest_price - open_positions[code]["buy_price"]) * p_shares * 0.995
-                        signals.append(f"✅ [虛擬平倉] 以 {latest_price} 賣出 (觸發防守或評級降級，預估獲利: {profit:.0f} 元)")
-                        del open_positions[code]
+                        signals.append(f"⚠️ [持倉風險警示] 評級轉弱或觸發防守價，建議考慮減碼或停損 (目前未實現: {roi:+.2f}%, {profit:+.0f}元)")
                 else:
-                    # 建倉條件：嚴格符合 can_enter (分數>=65且無一票否決)
                     if can_enter:
-                        total_capital = config.get("total_capital", 1000000)
-                        risk_pct = config.get("risk_per_trade_pct", 1.0) / 100.0
-                        risk_amount = total_capital * risk_pct
-                        
-                        from tech_indicators import calculate_atr
-                        atr = calculate_atr(stock.price, stock.high, stock.low, period=14)
-                        if atr:
-                            sl_dist = 1.5 * atr
-                        else:
-                            sl_dist = latest_price * 0.05
-                            
-                        buy_shares = int(risk_amount / sl_dist) if sl_dist > 0 else 0
-                        max_shares = int(total_capital / latest_price)
-                        buy_shares = min(buy_shares, max_shares)
-                        
-                        if buy_shares > 0:
-                            record_buy(code, today_date, latest_price, buy_shares)
-                            signals.append(f"✅ [虛擬建倉] 以 {latest_price} 買進 (進場評分: {score}，建議: {buy_shares} 股)")
-                            open_positions[code] = {"buy_price": latest_price, "buy_shares": buy_shares}
+                        signals.append(f"💡 [潛在建倉機會] 評估符合進場標準 (評分: {score}，防守價: {stop_loss:.2f})")
             
             # 🤖 Gemini AI 分析 (傳入 eval_result 以獲得明確進場判定)
             ai_insight = None
@@ -405,22 +522,46 @@ def main():
             
     report_md = generate_markdown_report(report_data, market_stats)
     
-    # 附加虛擬投資組合狀態 (Markdown)
-    portfolio_text = "\n### 💼 虛擬投資組合狀態\n"
+    # 附加實際持倉投資組合狀態 (Markdown)
+    portfolio_text = "\n### 💼 實際持倉投資組合狀態 (Portfolio Tracking)\n"
     if not open_positions:
         portfolio_text += "目前無持倉。\n"
     else:
-        portfolio_text += "| 股票代號 | 買進價格 | 目前價格 | 持有股數 | 未實現損益 |\n| -------- | -------- | -------- | -------- | ---------- |\n"
+        portfolio_text += (
+            "| 股票代號 | 股票名稱 | 買進均價 | 目前價格 | 持有股數 | 庫存現值 | 未實現損益 (報酬率) | 今日進場評級 |\n"
+            "| -------- | -------- | -------- | -------- | -------- | -------- | ------------------- | ------------ |\n"
+        )
+        total_cost = 0.0
+        total_market_val = 0.0
         for p_code, p_data in open_positions.items():
             p_price = p_data["buy_price"]
             p_shares = p_data.get("buy_shares", 0)
-            curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
+            p_item = next((item for item in report_data if item['code'] == p_code), None)
+            curr_price = p_item['price'] if p_item and p_item['price'] != "N/A" else p_price
+            s_info = twstock.codes.get(p_code)
+            stock_name = p_item['name'] if p_item else (s_info.name if s_info else "未知")
+            badge = p_item['eval'].get('verdict_badge', 'N/A') if p_item else 'N/A'
+            
             if curr_price != "N/A":
-                roi = (curr_price - p_price) / p_price * 100
-                profit_amt = (curr_price - p_price) * p_shares
-                portfolio_text += f"| {p_code} | {p_price:.2f} | {curr_price:.2f} | {p_shares} | {roi:+.2f}% ({profit_amt:+.0f}元) |\n"
+                cost = p_price * p_shares
+                m_val = curr_price * p_shares
+                total_cost += cost
+                total_market_val += m_val
+                profit_amt = m_val - cost
+                roi = (profit_amt / cost * 100) if cost > 0 else 0.0
+                portfolio_text += (
+                    f"| **{p_code}** | **{stock_name}** | {p_price:.2f} | {curr_price:.2f} | "
+                    f"{p_shares:,} | {m_val:,.0f}元 | **{roi:+.2f}% ({profit_amt:+,.0f}元)** | {badge} |\n"
+                )
             else:
-                portfolio_text += f"| {p_code} | {p_price:.2f} | N/A | {p_shares} | N/A |\n"
+                portfolio_text += f"| {p_code} | {stock_name} | {p_price:.2f} | N/A | {p_shares:,} | N/A | N/A | {badge} |\n"
+                
+        total_profit = total_market_val - total_cost
+        total_roi = (total_profit / total_cost * 100) if total_cost > 0 else 0.0
+        portfolio_text += (
+            f"| **合計 (Total)** | **{len(open_positions)} 檔** | - | - | - | "
+            f"**{total_market_val:,.0f}元** | **{total_roi:+.2f}% ({total_profit:+,.0f}元)** | - |\n"
+        )
     report_md = report_md.replace("---\n*💡", portfolio_text + "\n---\n*💡")
     
     # 儲存報告
@@ -436,30 +577,12 @@ def main():
     print(report_md)
     print("="*60 + "\n")
 
-    # Telegram 推播
+    # Telegram 推播 (高勝率實戰獲利指引)
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = config.get("telegram_chat_id")
     if bot_token and chat_id:
         logging.info("準備發送 Telegram 推播...")
-        report_tg = generate_telegram_report(report_data, market_stats)
-        
-        # 附加虛擬投資組合狀態 (Telegram HTML)
-        portfolio_tg = "\n💼 <b>虛擬投資組合狀態</b>\n"
-        if not open_positions:
-            portfolio_tg += "目前無持倉。\n"
-        else:
-            for p_code, p_data in open_positions.items():
-                p_price = p_data["buy_price"]
-                p_shares = p_data.get("buy_shares", 0)
-                curr_price = next((item['price'] for item in report_data if item['code'] == p_code), p_price)
-                if curr_price != "N/A":
-                    roi = (curr_price - p_price) / p_price * 100
-                    profit_amt = (curr_price - p_price) * p_shares
-                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ {curr_price:.2f} ({p_shares}股, <b>{roi:+.2f}%</b>, {profit_amt:+.0f}元)\n"
-                else:
-                    portfolio_tg += f"• {p_code}: {p_price:.2f} ➡️ N/A\n"
-        report_tg = report_tg.replace("💡 <i>", portfolio_tg + "\n💡 <i>")
-        
+        report_tg = generate_telegram_report(report_data, market_stats, open_positions)
         send_telegram_message(bot_token, chat_id, report_tg)
     elif bot_token and not chat_id:
         logging.warning("⚠️ 有偵測到 TELEGRAM_BOT_TOKEN，但 config.json 中沒有 telegram_chat_id。")

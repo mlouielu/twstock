@@ -2,7 +2,7 @@ import sqlite3
 import os
 import time
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import twstock
 from twstock.stock import DATATUPLE as Data
 
@@ -52,8 +52,39 @@ def init_db():
     conn.commit()
     conn.close()
 
+def sync_portfolio_from_json():
+    """
+    從 portfolio.json 同步使用者的真實投資部位至 SQLite portfolio 表
+    """
+    json_path = os.path.join(os.path.dirname(__file__), 'portfolio.json')
+    if not os.path.exists(json_path):
+        return
+    try:
+        import json
+        with open(json_path, 'r', encoding='utf-8') as f:
+            items = json.load(f)
+        init_db()
+        conn = _connect()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM portfolio WHERE status = 'OPEN'")
+        now_dt = datetime.now()
+        for item in items:
+            code = item["code"]
+            buy_price = float(item.get("buy_price", 0.0))
+            buy_shares = int(item.get("buy_shares", 0))
+            cursor.execute('''
+                INSERT INTO portfolio (code, buy_date, buy_price, buy_shares, status)
+                VALUES (?, ?, ?, ?, 'OPEN')
+            ''', (code, now_dt, buy_price, buy_shares))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logging.error(f"同步 portfolio.json 失敗: {e}")
+
 def get_open_positions():
     init_db()
+    # 優先從使用者設定的 portfolio.json 同步真實庫存
+    sync_portfolio_from_json()
     conn = sqlite3.connect(DB_PATH, timeout=10, detect_types=sqlite3.PARSE_DECLTYPES)
     conn.execute("PRAGMA journal_mode=WAL")
     cursor = conn.cursor()
@@ -212,3 +243,15 @@ def get_cached_stock(code, start_year, start_month):
     stock.data = final_data
     
     return stock
+
+def get_offline_stock(code, days=120):
+    """
+    純粹從 SQLite 本地資料庫讀取資料，零網路請求，適用於即時 Telegram 指令
+    """
+    init_db()
+    start_date = datetime.now() - timedelta(days=days)
+    final_data = get_from_db(code, start_date)
+    stock = twstock.Stock(code, initial_fetch=False)
+    stock.data = final_data
+    return stock
+

@@ -1,0 +1,182 @@
+[
+    {
+        "code": "2646",
+        "name": "星宇航空",
+        "type": "現股",
+        "buy_price": 24.69,
+        "buy_shares": 2000,
+        "app_profit": -8305,
+        "app_profit_pct": -16.82
+    },
+    {
+        "code": "00679B",
+        "name": "元大美債20年",
+        "type": "現股",
+        "buy_price": 27.29,
+        "buy_shares": 1100,
+        "app_profit": -1933,
+        "app_profit_pct": -6.44
+    },
+    {
+        "code": "00712",
+        "name": "復華富時不動產",
+        "type": "現股",
+        "buy_price": 8.70,
+        "buy_shares": 1000,
+        "app_profit": -114,
+        "app_profit_pct": -1.31
+    },
+    {
+        "code": "2616",
+        "name": "山隆",
+        "type": "現股",
+        "buy_price": 32.00,
+        "buy_shares": 5,
+        "app_profit": -94,
+        "app_profit_pct": -58.75
+    },
+    {
+        "code": "1217",
+        "name": "愛之味",
+        "type": "現股",
+        "buy_price": 10.86,
+        "buy_shares": 100,
+        "app_profit": -93,
+        "app_profit_pct": -8.56
+    },
+    {
+        "code": "2353",
+        "name": "宏碁",
+        "type": "現股",
+        "buy_price": 36.00,
+        "buy_shares": 1,
+        "app_profit": -6,
+        "app_profit_pct": -16.67
+    },
+    {
+        "code": "2883",
+        "name": "凱基金",
+        "type": "現股",
+        "buy_price": 10.00,
+        "buy_shares": 1,
+        "app_profit": 25,
+        "app_profit_pct": 250.00
+    },
+    {
+        "code": "2002",
+        "name": "中鋼",
+        "type": "現股",
+        "buy_price": 19.27,
+        "buy_shares": 1001,
+        "app_profit": 27,
+        "app_profit_pct": 0.14
+    },
+    {
+        "code": "1907",
+        "name": "永豐餘",
+        "type": "現股",
+        "buy_price": 26.11,
+        "buy_shares": 100,
+        "app_profit": 300,
+        "app_profit_pct": 11.49
+    },
+    {
+        "code": "1904",
+        "name": "正隆",
+        "type": "現股",
+        "buy_price": 17.39,
+        "buy_shares": 101,
+        "app_profit": 714,
+        "app_profit_pct": 40.65
+    },
+    {
+        "code": "00878",
+        "name": "國泰永續高股息",
+        "type": "現股",
+        "buy_price": 19.16,
+        "buy_shares": 100,
+        "app_profit": 1501,
+        "app_profit_pct": 78.34
+    },
+    {
+        "code": "2330",
+        "name": "台積電",
+        "type": "現股",
+        "buy_price": 2290.64,
+        "buy_shares": 10,
+        "app_profit": 1860,
+        "app_profit_pct": 8.12
+    },
+    {
+        "code": "1101",
+        "name": "台泥",
+        "type": "現股",
+        "buy_price": 22.57,
+        "buy_shares": 1001,
+        "app_profit": 2205,
+        "app_profit_pct": 9.76
+    },
+    {
+        "code": "2890",
+        "name": "永豐金",
+        "type": "現股",
+        "buy_price": 21.00,
+        "buy_shares": 105,
+        "app_profit": 2357,
+        "app_profit_pct": 106.90
+    },
+    {
+        "code": "3481",
+        "name": "群創",
+        "type": "現股",
+        "buy_price": 22.36,
+        "buy_shares": 200,
+        "app_profit": 5575,
+        "app_profit_pct": 124.69
+    },
+    {
+        "code": "00919",
+        "name": "群益台灣精選高息",
+        "type": "定額",
+        "buy_price": 25.57,
+        "buy_shares": 828,
+        "app_profit": 5826,
+        "app_profit_pct": 27.52
+    },
+    {
+        "code": "00631L",
+        "name": "元大台灣50正2",
+        "type": "現股",
+        "buy_price": 28.78,
+        "buy_shares": 1000,
+        "app_profit": 9090,
+        "app_profit_pct": 31.58
+    },
+    {
+        "code": "0050",
+        "name": "元大台灣50",
+        "type": "定額",
+        "buy_price": 83.27,
+        "buy_shares": 387,
+        "app_profit": 10367,
+        "app_profit_pct": 32.17
+    },
+    {
+        "code": "00940",
+        "name": "元大台灣價值高息",
+        "type": "定額",
+        "buy_price": 10.16,
+        "buy_shares": 3811,
+        "app_profit": 10547,
+        "app_profit_pct": 27.25
+    },
+    {
+        "code": "0052",
+        "name": "富邦科技",
+        "type": "定額",
+        "buy_price": 47.20,
+        "buy_shares": 652,
+        "app_profit": 10929,
+        "app_profit_pct": 35.51
+    }
+]
