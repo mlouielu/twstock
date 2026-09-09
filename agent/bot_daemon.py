@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import twstock
 from main import StrategyEngine, load_config
+from entry_evaluator import EntryEvaluator
 from gemini_utils import get_gemini_insight
 from telegram_utils import send_telegram_message
 from db_utils import get_cached_stock, get_open_positions
@@ -34,7 +35,7 @@ def handle_command(text, bot_token, chat_id):
             "/list - 查看目前觀察名單\n"
             "/add [代號] - 加入觀察名單 (例: <code>/add 2330</code>)\n"
             "/remove [代號] - 移除觀察名單 (例: <code>/remove 2330</code>)\n"
-            "/analyze [代號] - 即時分析特定股票 (例: <code>/analyze 2330</code>)\n"
+            "/analyze [代號] - 即時進場指引分析 (例: <code>/analyze 2330</code>)\n"
             "/portfolio - 查看目前虛擬持倉績效"
         )
         send_telegram_message(bot_token, chat_id, msg)
@@ -78,7 +79,6 @@ def handle_command(text, bot_token, chat_id):
         msg = "💼 <b>目前虛擬投資組合狀態</b>\n\n"
         for p_code, p_data in open_positions.items():
             p_price = p_data["buy_price"]
-            # 抓取最新價格
             before = datetime.now() - timedelta(days=10)
             try:
                 stock = get_cached_stock(p_code, before.year, before.month)
@@ -98,39 +98,52 @@ def handle_command(text, bot_token, chat_id):
             send_telegram_message(bot_token, chat_id, "請提供股票代號，例如: <code>/analyze 2330</code>")
             return
         code = parts[1]
-        send_telegram_message(bot_token, chat_id, f"⏳ 正在分析 <b>{code}</b>，請稍候...")
+        send_telegram_message(bot_token, chat_id, f"⏳ 正在分析 <b>{code}</b> 進場指引，請稍候...")
         
         try:
-            before = datetime.now() - timedelta(days=60)
+            before = datetime.now() - timedelta(days=120)
             stock = get_cached_stock(code, before.year, before.month)
             stock_info = twstock.codes.get(code)
             stock_name = stock_info.name if stock_info else "未知"
             latest_price = stock.price[-1] if stock.price else "N/A"
             
-            engine = StrategyEngine(stock)
-            signals = engine.run_all()
+            evaluator = EntryEvaluator(stock)
+            eval_result = evaluator.evaluate()
+            signals = eval_result.get("signals", [])
             
             gemini_token = os.environ.get("GEMINI_API_TOKEN") or os.environ.get("ＧEMINI_API_TOKEN")
             ai_insight = None
             if gemini_token and signals:
-                ai_insight = get_gemini_insight(gemini_token, code, stock_name, latest_price, signals)
+                ai_insight = get_gemini_insight(gemini_token, code, stock_name, latest_price, signals, eval_dict=eval_result)
                 
-            msg = f"📊 <b>{code} {stock_name} 即時分析</b> (最新價格: {latest_price})\n\n"
+            badge = eval_result.get("verdict_badge", "🟡 建議觀望")
+            score = eval_result.get("score", 50)
+            rrr = eval_result.get("rrr", 1.0)
+            entry_s = eval_result.get("suggested_entry", "")
+            sl = eval_result.get("stop_loss", 0.0)
+            target = eval_result.get("upside_target", 0.0)
+            
+            msg = (f"🎯 <b>{code} {stock_name} 進場指引分析</b>\n"
+                   f"────────────────────\n"
+                   f"⚡ <b>是否可進場</b>: <b>{badge}</b>\n"
+                   f"📊 <b>進場評分</b>: <code>{score}/100</code> | <b>風報比</b>: <code>{rrr:.2f}</code>\n"
+                   f"💰 <b>最新收盤</b>: {latest_price}\n"
+                   f"🎯 <b>進場策略</b>: {entry_s}\n"
+                   f"🛡️ <b>防守停損</b>: {sl:.2f} ➡️ <b>目標價</b>: {target:.2f}\n\n")
+            
             if signals:
-                msg += "<b>觸發訊號:</b>\n"
+                msg += "<b>技術面與情境訊號:</b>\n"
                 for sig in signals:
                     clean_sig = sig.replace('**', '')
                     msg += f"• {clean_sig}\n"
-            else:
-                msg += "無觸發任何技術面訊號。\n"
-                
+                    
             if ai_insight:
-                msg += f"\n🤖 <b>AI 洞察:</b>\n{ai_insight}"
+                msg += f"\n🤖 <b>AI 實戰洞察:</b>\n{ai_insight}"
                 
             send_telegram_message(bot_token, chat_id, msg)
             
         except Exception as e:
-            logging.error(f"分析失敗: {e}")
+            logging.error(f"分析失敗: {e}", exc_info=True)
             send_telegram_message(bot_token, chat_id, f"❌ 分析 <b>{code}</b> 時發生錯誤: {str(e)}")
 
 def main():
