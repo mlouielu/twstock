@@ -423,7 +423,7 @@ def generate_telegram_report(report_data, market_stats=None, open_positions=None
             
     # ── 第四區塊：快捷獲利指令 ───────────────────────────────
     lines.append("────────────────────")
-    lines.append("📱 <b>實戰指令</b>: <code>/action</code> 今日決策卡 | <code>/top</code> 獲利潛力股 | <code>/alerts</code> 警報清單 | <code>/analyze [代號]</code>")
+    lines.append("📱 <b>實戰指令</b>: /action 今日決策卡 | /top 獲利潛力股 | /alerts 警報清單 | /analyze [代號]")
     return "\n".join(lines)
 
 def main():
