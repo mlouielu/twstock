@@ -3,20 +3,34 @@
 
 class Analytics(object):
     def continuous(self, data):
-        diff = [1 if data[-i] > data[-i - 1] else -1 for i in range(1, len(data))]
+        # A missing day (stock.py turns the exchange's "--" into None) ends the
+        # run: comparing against None raises TypeError, and a run interrupted by
+        # a gap is not continuous anyway.
+        diff = []
+        for i in range(1, len(data)):
+            previous, current = data[-i - 1], data[-i]
+            if previous is None or current is None:
+                break
+            diff.append(1 if current > previous else -1)
         cont = 0
         for v in diff:
             if v == diff[0]:
                 cont += 1
             else:
                 break
-        return cont * diff[0]
+        return cont * diff[0] if diff else 0
 
     def moving_average(self, data, days):
         result = []
         data = data[:]
         for _ in range(len(data) - days + 1):
-            result.append(round(sum(data[-days:]) / days, 2))
+            window = data[-days:]
+            # A window that contains a missing day has no meaningful average.
+            # Report None instead of imputing a price that never traded.
+            if any(value is None for value in window):
+                result.append(None)
+            else:
+                result.append(round(sum(window) / days, 2))
             data.pop()
         return result[::-1]
 
@@ -24,9 +38,13 @@ class Analytics(object):
         """Calculate moving average bias ratio"""
         data1 = self.moving_average(self.price, day1)
         data2 = self.moving_average(self.price, day2)
-        result = [
-            data1[-i] - data2[-i] for i in range(1, min(len(data1), len(data2)) + 1)
-        ]
+        result = []
+        for i in range(1, min(len(data1), len(data2)) + 1):
+            short, long = data1[-i], data2[-i]
+            if short is None or long is None:
+                result.append(None)
+            else:
+                result.append(short - long)
 
         return result[::-1]
 

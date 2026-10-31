@@ -10,9 +10,14 @@ class LegacyAnalytics(object):
         :rtype: int
         :returns: 向量數值：正數向上、負數向下。
         """
+        # 缺失值（stock.py 將證交所的 "--" 轉為 None）會中斷連續性，
+        # 且與 None 比較會拋 TypeError，因此遇到缺失即停止往前計數。
         diff_data = []
         for i in range(1, len(list_data)):
-            if list_data[-i] > list_data[-i - 1]:
+            previous, current = list_data[-i - 1], list_data[-i]
+            if previous is None or current is None:
+                break
+            if current > previous:
                 diff_data.append(1)
             else:
                 diff_data.append(-1)
@@ -22,7 +27,7 @@ class LegacyAnalytics(object):
                 cont += 1
             else:
                 break
-        return cont * diff_data[0]
+        return cont * diff_data[0] if diff_data else 0
 
     def moving_average(self, data, days):
         """計算移動平均數
@@ -32,7 +37,12 @@ class LegacyAnalytics(object):
         result = []
         data = data[:]
         for dummy in range(len(data) - int(days) + 1):
-            result.append(round(sum(data[-days:]) / days, 2))
+            window = data[-days:]
+            # 區間內含缺失值時移動平均沒有意義，回傳 None 而不代填價格。
+            if any(value is None for value in window):
+                result.append(None)
+            else:
+                result.append(round(sum(window) / days, 2))
             data.pop()
         result.reverse()
         return result
@@ -49,7 +59,11 @@ class LegacyAnalytics(object):
         data2 = self.moving_average(data, date2)
         cal_list = []
         for i in range(1, min(len(data1), len(data2)) + 1):
-            cal_list.append(data1[-i] - data2[-i])
+            short, long = data1[-i], data2[-i]
+            if short is None or long is None:
+                cal_list.append(None)
+            else:
+                cal_list.append(short - long)
         cal_list.reverse()
         return cal_list
 
