@@ -52,6 +52,41 @@ class AnalyticsTest(unittest.TestCase):
         self.assertEqual(ng_result, legacy_result)
         self.assertEqual(ng_result, [55.0, 65.0, 72.5])
 
+    def test_moving_average_with_none(self):
+        # stock.py converts the exchange's "--" (no trade) into None, so a real
+        # series can contain None. A window holding a missing day has no
+        # meaningful average, so that point is None instead of raising.
+        data = [50, 60, 70, None, 80, 90]
+
+        ng_result = self.ng.moving_average(data, 2)
+        legacy_result = self.legacy.moving_average(data, 2)
+        self.assertEqual(ng_result, legacy_result)
+        self.assertEqual(ng_result, [55.0, 65.0, None, None, 85.0])
+
+    def test_continuous_with_none(self):
+        # The run is interrupted by the gap: only 70 -> 60 -> 50 counts.
+        data = [50, 60, 70, None, 80, 90]
+        ng_result = self.ng.continuous(data)
+        self.assertEqual(ng_result, self.legacy.cal_continue(data))
+        self.assertEqual(ng_result, 1)
+
+    def test_ma_bias_ratio_with_none(self):
+        data = [50, 60, 70, None, 80, 90]
+        self.ng.price = data
+        ng_result = self.ng.ma_bias_ratio(2, 3)
+        legacy_result = self.legacy.ma_bias_ratio(2, 3, data)
+        self.assertEqual(ng_result, legacy_result)
+        self.assertEqual(ng_result, [5.0, None, None, None])
+
+    def test_all_none_does_not_raise(self):
+        # A fully missing series (delisted or no trades in range) must return
+        # empty/all-None results rather than raising.
+        for series in ([None, None, None], [None], []):
+            self.assertEqual(self.ng.moving_average(series, 2),
+                             self.legacy.moving_average(series, 2))
+            self.assertEqual(self.ng.continuous(series),
+                             self.legacy.cal_continue(series))
+
     def test_ma_bias_ratio(self):
         data = [50, 60, 70, 75, 80, 88, 102, 105, 106]
         self.ng.price = data
